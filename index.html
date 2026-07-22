@@ -123,7 +123,10 @@ button, input, textarea, select { font-family: inherit; }
 .calendar-nav { display: flex; align-items: center; justify-content: space-between; max-width: 700px; margin: 0 auto 12px; }
 .calendar-nav-btn { background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 8px; padding: 6px 14px; cursor: pointer; font-size: 16px; color: var(--text-primary); }
 .calendar-nav-btn:hover { background: var(--surface-2); border-color: var(--border-stronger); }
-.calendar-nav h3 { margin: 0; font-size: 16px; font-weight: 500; color: var(--text-primary); }
+.calendar-nav h3 { margin: 0; font-size: 16px; font-weight: 500; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+.calendar-updown-stack { display: flex; flex-direction: column; gap: 2px; }
+.calendar-updown-btn { background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 4px; padding: 0; width: 18px; height: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 9px; line-height: 1; color: var(--text-primary); }
+.calendar-updown-btn:hover { background: var(--surface-2); border-color: var(--border-stronger); }
 .calendar-today-row { max-width: 700px; margin: 0 auto 14px; display: flex; justify-content: flex-end; }
 .calendar-today-btn { background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 8px; padding: 8px 18px; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text-primary); }
 .calendar-today-btn:hover { background: var(--surface-2); border-color: var(--border-stronger); }
@@ -560,7 +563,18 @@ body.theme-lavender {
     </div>
     <div class="calendar-nav">
       <button class="calendar-nav-btn" onclick="changeMonth(-1)" aria-label="Previous month">‹</button>
-      <h3 id="calendarMonthLabel">Month Year</h3>
+      <h3 id="calendarMonthLabel">
+        <span class="calendar-updown-stack">
+          <button class="calendar-updown-btn" onclick="changeMonth(1)" aria-label="Next month">▲</button>
+          <button class="calendar-updown-btn" onclick="changeMonth(-1)" aria-label="Previous month">▼</button>
+        </span>
+        <span id="calendarMonthName">Month</span>
+        <span id="calendarYearName">Year</span>
+        <span class="calendar-updown-stack">
+          <button class="calendar-updown-btn" onclick="changeYear(1)" aria-label="Next year">▲</button>
+          <button class="calendar-updown-btn" onclick="changeYear(-1)" aria-label="Previous year">▼</button>
+        </span>
+      </h3>
       <button class="calendar-nav-btn" onclick="changeMonth(1)" aria-label="Next month">›</button>
     </div>
     <div class="calendar-weekdays">
@@ -1442,6 +1456,11 @@ function changeMonth(delta) {
   renderCalendar();
 }
 
+function changeYear(delta) {
+  calendarViewYear += delta;
+  renderCalendar();
+}
+
 function goToToday() {
   const today = new Date();
   calendarViewYear = today.getFullYear();
@@ -1450,7 +1469,8 @@ function goToToday() {
 }
 
 function renderCalendar() {
-  document.getElementById('calendarMonthLabel').textContent = MONTH_NAMES[calendarViewMonth] + ' ' + calendarViewYear;
+  document.getElementById('calendarMonthName').textContent = MONTH_NAMES[calendarViewMonth];
+  document.getElementById('calendarYearName').textContent = calendarViewYear;
 
   const tasksByDate = {};
   getTasks().forEach(t => {
