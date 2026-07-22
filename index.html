@@ -43,29 +43,29 @@ html, body {
 .home-header { text-align: center; }
 .home-header h1 { font-size: 24px; font-weight: 500; color: var(--text-primary); margin: 0 0 8px; }
 .home-header p { font-size: 14px; color: var(--text-secondary); margin: 0; }
-.options-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; width: 100%; max-width: 700px; }
-.option-card { background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 12px; padding: 2rem 1.5rem; text-align: center; cursor: pointer; transition: all 0.2s; }
+.options-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; width: 100%; max-width: 900px; }
+.option-card { background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 16px; padding: 2.75rem 2rem; text-align: center; cursor: pointer; transition: all 0.2s; }
 .option-card:hover { border-color: var(--border-stronger); background: var(--surface-2); }
 .option-card:active { transform: scale(0.98); }
-.option-icon { font-size: 32px; margin-bottom: 12px; color: var(--text-accent); }
-.calendar-icon-shape { width: 72px; height: 72px; margin: 0 auto 12px; position: relative; }
-.calendar-icon-rings { position: absolute; top: -7px; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 16px; z-index: 2; }
-.calendar-icon-rings span { width: 8px; height: 16px; background: var(--text-secondary); border-radius: 4px; display: block; }
-.calendar-icon-top { position: absolute; top: 0; left: 0; right: 0; height: 20px; background: #e6483c; border-radius: 10px 10px 0 0; }
-.calendar-icon-body { position: absolute; top: 20px; left: 0; right: 0; bottom: 0; background: #ffffff; border: 2px solid var(--border-strong); border-top: none; border-radius: 0 0 10px 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.08); }
-.calendar-icon-body span { font-size: 26px; font-weight: 700; color: #2d2d2d; font-family: var(--font-primary); }
-.todo-icon-shape { width: 72px; height: 72px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; }
-.todo-icon-box { width: 56px; height: 56px; background: #ffffff; border: 3px solid var(--border-strong); border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; }
-.todo-icon-check { width: 24px; height: 13px; border-left: 5px solid #3ea88e; border-bottom: 5px solid #3ea88e; transform: rotate(-45deg); margin-top: -4px; }
-.pencil-icon-shape { width: 72px; height: 72px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; }
-.pencil-icon { display: flex; align-items: center; transform: rotate(-45deg); filter: drop-shadow(0 2px 3px rgba(0,0,0,0.12)); }
+.option-icon { font-size: 40px; margin-bottom: 14px; color: var(--text-accent); }
+.calendar-icon-shape { width: 96px; height: 96px; margin: 0 auto 16px; position: relative; }
+.calendar-icon-rings { position: absolute; top: -9px; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 22px; z-index: 2; }
+.calendar-icon-rings span { width: 10px; height: 20px; background: var(--text-secondary); border-radius: 5px; display: block; }
+.calendar-icon-top { position: absolute; top: 0; left: 0; right: 0; height: 26px; background: #e6483c; border-radius: 13px 13px 0 0; }
+.calendar-icon-body { position: absolute; top: 26px; left: 0; right: 0; bottom: 0; background: #ffffff; border: 3px solid var(--border-strong); border-top: none; border-radius: 0 0 13px 13px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.08); }
+.calendar-icon-body span { font-size: 34px; font-weight: 700; color: #2d2d2d; font-family: var(--font-primary); }
+.todo-icon-shape { width: 96px; height: 96px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; }
+.todo-icon-box { width: 74px; height: 74px; background: #ffffff; border: 4px solid var(--border-strong); border-radius: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; }
+.todo-icon-check { width: 32px; height: 17px; border-left: 7px solid #3ea88e; border-bottom: 7px solid #3ea88e; transform: rotate(-45deg); margin-top: -5px; }
+.pencil-icon-shape { width: 96px; height: 96px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; }
+.pencil-icon { display: flex; align-items: center; transform: rotate(-45deg) scale(1.3); filter: drop-shadow(0 2px 3px rgba(0,0,0,0.12)); }
 .pencil-eraser { width: 10px; height: 18px; background: #f4879a; border: 2px solid var(--border-strong); border-right: none; border-radius: 4px 0 0 4px; }
 .pencil-band { width: 6px; height: 18px; background: #d9d9d9; border-top: 2px solid var(--border-strong); border-bottom: 2px solid var(--border-strong); }
 .pencil-body { width: 30px; height: 18px; background: #f2c14e; border-top: 2px solid var(--border-strong); border-bottom: 2px solid var(--border-strong); }
 .pencil-tip-wood { width: 0; height: 0; border-top: 9px solid transparent; border-bottom: 9px solid transparent; border-left: 12px solid #e8b34d; }
 .pencil-tip-lead { width: 0; height: 0; border-top: 4px solid transparent; border-bottom: 4px solid transparent; border-left: 6px solid #3a2a1a; margin-left: -1px; }
-.option-card h2 { font-size: 16px; font-weight: 500; color: var(--text-primary); margin: 0 0 8px; }
-.option-card p { font-size: 13px; color: var(--text-secondary); margin: 0; }
+.option-card h2 { font-size: 18px; font-weight: 500; color: var(--text-primary); margin: 0 0 8px; }
+.option-card p { font-size: 14px; color: var(--text-secondary); margin: 0; }
 .hidden { display: none !important; }
 .header-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem; }
 .header-bar button { background: none; border: none; padding: 4px 8px; color: var(--text-secondary); cursor: pointer; font-size: 18px; }
