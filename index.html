@@ -184,6 +184,8 @@ button, input, textarea, select { font-family: inherit; }
 .note-textarea-full { position: absolute; inset: 0; width: 100%; height: 100%; border: none; background: transparent; padding: 16px; font-size: 15px; font-family: inherit; overflow-y: auto; color: var(--text-primary); }
 .note-textarea-full:focus { outline: none; }
 .note-textarea-full.is-empty:before { content: attr(data-placeholder); color: var(--text-secondary); pointer-events: none; }
+.note-textarea-full ul, .note-textarea-full ol { margin: 0 0 0 1.4em; padding: 0; }
+.note-textarea-full li { margin-bottom: 4px; }
 .note-canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; }
 .note-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; max-width: 700px; margin: 0 auto; position: relative; }
 .note-tool-btn { background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 10px; padding: 10px 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-primary); font-size: 18px; font-weight: 700; min-width: 48px; }
@@ -598,6 +600,12 @@ body.theme-autumn {
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="9" width="14" height="8" rx="2" transform="rotate(-20 12 13)"></rect><line x1="6" y1="20" x2="18" y2="20"></line></svg>
       </button>
       <button class="note-tool-btn" id="toolTextBtn" onclick="setNoteTool('text')" title="Text" aria-label="Text">A</button>
+      <button class="note-tool-btn" onclick="insertBulletList()" title="Bullet list" aria-label="Bullet list">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="9" y1="6" x2="20" y2="6"></line><line x1="9" y1="12" x2="20" y2="12"></line><line x1="9" y1="18" x2="20" y2="18"></line><circle cx="4" cy="6" r="1.5" fill="currentColor" stroke="none"></circle><circle cx="4" cy="12" r="1.5" fill="currentColor" stroke="none"></circle><circle cx="4" cy="18" r="1.5" fill="currentColor" stroke="none"></circle></svg>
+      </button>
+      <button class="note-tool-btn" onclick="insertNumberedList()" title="Numbered list" aria-label="Numbered list">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="9" y1="6" x2="20" y2="6"></line><line x1="9" y1="12" x2="20" y2="12"></line><line x1="9" y1="18" x2="20" y2="18"></line><text x="1" y="8.5" font-size="8" fill="currentColor" stroke="none" font-family="sans-serif">1</text><text x="1" y="14.5" font-size="8" fill="currentColor" stroke="none" font-family="sans-serif">2</text><text x="1" y="20.5" font-size="8" fill="currentColor" stroke="none" font-family="sans-serif">3</text></svg>
+      </button>
       <div class="note-color-wrapper">
         <button class="note-tool-btn" id="toolColorBtn" onclick="toggleColorPicker()" title="Color" aria-label="Color">
           <span id="colorDropIcon" class="color-drop-swatch"></span>
@@ -1150,7 +1158,7 @@ function applyNoteTool(tool) {
   }
 }
 
-function applyTypingColor() {
+function focusNoteTextareaAtSavedRange() {
   const textarea = document.getElementById('noteTextArea');
   textarea.focus();
   const sel = window.getSelection();
@@ -1164,10 +1172,41 @@ function applyTypingColor() {
     sel.removeAllRanges();
     sel.addRange(range);
   }
+  return textarea;
+}
+
+function applyTypingColor() {
+  focusNoteTextareaAtSavedRange();
   try {
     document.execCommand('styleWithCSS', false, true);
     document.execCommand('foreColor', false, currentNoteColor);
   } catch (e) {}
+}
+
+function insertBulletList() {
+  applyListFormat('insertUnorderedList');
+}
+
+function insertNumberedList() {
+  applyListFormat('insertOrderedList');
+}
+
+function applyListFormat(command) {
+  if (currentNoteTool !== 'text') {
+    setNoteTool('text');
+  }
+  const textarea = focusNoteTextareaAtSavedRange();
+  try {
+    document.execCommand(command, false, null);
+  } catch (e) {}
+  const range = document.createRange();
+  range.selectNodeContents(textarea);
+  range.collapse(false);
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+  handleNoteTextInput(textarea);
+  saveNoteSelection();
 }
 
 function renderColorPickerOptions() {
