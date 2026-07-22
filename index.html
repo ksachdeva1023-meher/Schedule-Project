@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Task, Calendar & Notes</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2/dist/tabler-icons.min.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Changa+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Itim&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Amatic+SC&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap');
+
+:root {
+  --font-primary: 'Anthropic Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --radius: 8px;
+}
+
+html, body {
+  font-family: var(--font-primary);
+  background-color: var(--surface-0);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  margin: 0;
+}
+
+* { box-sizing: border-box; }
+.app-container { padding: 1.5rem; background-color: var(--surface-0); min-height: 100vh; transition: background-color 0.3s ease; }
+.header-top { position: fixed; top: 16px; right: 16px; z-index: 100; display: flex; gap: 12px; }
+.settings-button { background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 8px; padding: 14px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; font-size: 28px; color: var(--text-secondary); }
+.settings-button:hover { border-color: var(--border-stronger); background: var(--surface-2); }
+.settings-button:active { transform: scale(0.95); }
+.profile-section { position: fixed; top: 16px; left: 16px; z-index: 100; }
+.profile-card { background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.2s; min-width: 200px; }
+.profile-card:hover { border-color: var(--border-stronger); background: var(--surface-2); }
+.profile-card:active { transform: scale(0.98); }
+.profile-avatar-small { width: 36px; height: 36px; border-radius: 50%; background: var(--bg-accent); display: flex; align-items: center; justify-content: center; font-weight: 500; font-size: 13px; color: var(--on-accent); flex-shrink: 0; }
+.profile-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.profile-name { font-size: 14px; font-weight: 500; color: var(--text-primary); margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.profile-label { font-size: 11px; color: var(--text-secondary); margin: 0; }
+.home-screen { display: flex; flex-direction: column; gap: 1.5rem; align-items: center; margin-top: 2rem; }
+.home-header { text-align: center; }
+.home-header h1 { font-size: 24px; font-weight: 500; color: var(--text-primary); margin: 0 0 8px; }
+.home-header p { font-size: 14px; color: var(--text-secondary); margin: 0; }
+.options-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; width: 100%; max-width: 700px; }
+.option-card { background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 12px; padding: 2rem 1.5rem; text-align: center; cursor: pointer; transition: all 0.2s; }
+.option-card:hover { border-color: var(--border-stronger); background: var(--surface-2); }
+.option-card:active { transform: scale(0.98); }
+.option-icon { font-size: 32px; margin-bottom: 12px; color: var(--text-accent); }
+.option-card h2 { font-size: 16px; font-weight: 500; color: var(--text-primary); margin: 0 0 8px; }
+.option-card p { font-size: 13px; color: var(--text-secondary); margin: 0; }
+.hidden { display: none !important; }
+.header-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem; }
+.header-bar button { background: none; border: none; padding: 4px 8px; color: var(--text-secondary); cursor: pointer; font-size: 18px; }
+.header-bar h2 { font-size: 18px; font-weight: 500; color: var(--text-primary); margin: 0; flex: 1; }
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.45); display: flex; align-items: center; justify-content: center; z-index: 200; min-height: 400px; }
+.modal-card { background: var(--surface-2); border-radius: 12px; border: 0.5px solid var(--border); padding: 1.5rem; max-width: 400px; width: 90%; max-height: 80vh; overflow-y: auto; }
+.modal-header-top { display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem; }
+.modal-close-btn { background: none; border: none; padding: 4px 8px; color: var(--text-secondary); cursor: pointer; font-size: 18px; }
+.modal-header { font-size: 18px; font-weight: 500; color: var(--text-primary); margin: 0; flex: 1; }
+.form-group { margin-bottom: 1.5rem; }
+.form-group label { display: block; font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; font-weight: 500; }
+.form-group input { width: 100%; padding: 10px 12px; border: 0.5px solid var(--border-strong); border-radius: var(--radius); font-size: 14px; background: var(--surface-1); color: var(--text-primary); }
+.form-group input:focus { outline: none; border-color: var(--border-accent); box-shadow: 0 0 0 2px var(--bg-accent); }
+.options-group { display: flex; flex-direction: column; gap: 8px; }
+.option-radio { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+.option-radio:hover { border-color: var(--border-stronger); background: var(--surface-0); }
+.option-radio.selected { border: 2px solid var(--fill-accent); background: var(--bg-accent); }
+.option-radio input { cursor: pointer; }
+.option-radio label { cursor: pointer; flex: 1; margin: 0; font-size: 14px; color: var(--text-primary); }
+.theme-preview { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--text-primary); flex-shrink: 0; }
+.modal-actions { display: flex; gap: 10px; margin-top: 1.5rem; }
+.modal-actions button { flex: 1; padding: 10px 16px; border-radius: var(--radius); border: 0.5px solid var(--border-strong); background: var(--surface-1); color: var(--text-primary); cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+.modal-actions button:hover { background: var(--surface-0); border-color: var(--border-stronger); }
+.modal-actions .save-btn { background: var(--fill-accent); color: var(--on-accent); border: none; }
+.modal-actions .save-btn:hover { background: var(--fill-accent-hover); }
+.profile-list { display: flex; flex-direction: column; gap: 8px; }
+.profile-item { background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 8px; padding: 12px; display: flex; align-items: center; gap: 12px; }
+.profile-item.active { border: 2px solid var(--fill-accent); background: var(--bg-accent); }
+.profile-item.active .profile-item-name { color: var(--text-accent); }
+.profile-item-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--bg-accent); display: flex; align-items: center; justify-content: center; font-weight: 500; font-size: 12px; color: var(--on-accent); flex-shrink: 0; }
+.profile-item-name { font-size: 14px; font-weight: 500; color: var(--text-primary); }
+.profile-item-email { font-size: 12px; color: var(--text-secondary); }
+.profile-item-details { flex: 1; min-width: 0; }
+.profile-item-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.action-button { padding: 6px 12px; border-radius: var(--radius); border: 0.5px solid var(--border-strong); background: var(--surface-1); color: var(--text-primary); cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap; }
+.action-button:hover { background: var(--surface-0); border-color: var(--border-stronger); }
+.action-button.select-btn { background: var(--fill-accent); color: var(--on-accent); border: none; }
+.action-button.select-btn:hover { background: var(--fill-accent-hover); }
+.create-profile-button { width: 100%; padding: 10px 16px; border-radius: var(--radius); border: none; background: var(--fill-accent); color: var(--on-accent); cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; margin-top: 8px; }
+.create-profile-button:hover { background: var(--fill-accent-hover); }
+
+.notes-list { display: flex; flex-direction: column; gap: 10px; max-width: 700px; margin: 0 auto; }
+.note-card { background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 10px; padding: 14px 16px; cursor: pointer; transition: all 0.2s; }
+.note-card:hover { border-color: var(--border-stronger); background: var(--surface-2); }
+.note-card:active { transform: scale(0.98); }
+.note-card-title { font-size: 15px; font-weight: 500; color: var(--text-primary); margin: 0 0 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.note-card-snippet { font-size: 13px; color: var(--text-secondary); margin: 0 0 6px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; white-space: pre-wrap; }
+.note-card-date { font-size: 11px; color: var(--text-muted); margin: 0; }
+.notes-empty { color: var(--text-secondary); text-align: center; font-size: 14px; margin-top: 2rem; }
+.note-textarea { width: 100%; min-height: 180px; padding: 10px 12px; border: 0.5px solid var(--border-strong); border-radius: var(--radius); font-size: 14px; background: var(--surface-1); color: var(--text-primary); font-family: inherit; resize: vertical; }
+.note-textarea:focus { outline: none; border-color: var(--border-accent); box-shadow: 0 0 0 2px var(--bg-accent); }
+
+body.font-serif { --font-primary: 'Georgia', 'Times New Roman', serif; }
+body.font-mono { --font-primary: 'Courier New', 'Courier', monospace; }
+body.font-changa { --font-primary: 'Changa One', sans-serif; }
+body.font-indie { --font-primary: 'Indie Flower', cursive; }
+body.font-itim { --font-primary: 'Itim', cursive; }
+body.font-amatic { --font-primary: 'Amatic SC', cursive; }
+body.font-comic { --font-primary: 'Comic Neue', cursive; }
+
+body.theme-cherry {
+  --surface-0: #fdd4e4;
+  --surface-1: #ffe6f0;
+  --surface-2: #ffd1e5;
+  --text-primary: #5a0020;
+  --text-secondary: #8a0035;
+  --text-muted: #aa5577;
+  --border: #ff99c8;
+  --border-strong: #ff77bb;
+  --bg-accent: #a8e6c1;
+  --text-accent: #0d4d2f;
+  --fill-accent: #7dd3a0;
+  --fill-accent-hover: #5ac986;
+  --on-accent: #ffffff;
+}
+
+body.theme-arctic {
+  --surface-0: #cce5ff;
+  --surface-1: #d4e6ff;
+  --surface-2: #b3d9ff;
+  --text-primary: #001a4d;
+  --text-secondary: #004080;
+  --text-muted: #0055b3;
+  --border: #4da6ff;
+  --border-strong: #2d87e8;
+  --bg-accent: #4da6ff;
+  --text-accent: #001a4d;
+  --fill-accent: #0075e6;
+  --fill-accent-hover: #0055b3;
+  --on-accent: #ffffff;
+}
+
+body.theme-coffee {
+  --surface-0: #d9c8b8;
+  --surface-1: #d4a574;
+  --surface-2: #c49660;
+  --text-primary: #2d1810;
+  --text-secondary: #3d2817;
+  --text-muted: #5a3d2a;
+  --border: #b8956a;
+  --border-strong: #a0825d;
+  --bg-accent: #e8d5b7;
+  --text-accent: #2d1810;
+  --fill-accent: #c9a876;
+  --fill-accent-hover: #b39463;
+  --on-accent: #ffffff;
+}
+
+body.theme-jungle {
+  --surface-0: #c3dcc9;
+  --surface-1: #a8dba8;
+  --surface-2: #7ecb7e;
+  --text-primary: #0d3d1f;
+  --text-secondary: #1a5c33;
+  --text-muted: #2d7a47;
+  --border: #5ab89f;
+  --border-strong: #3ea88e;
+  --bg-accent: #7dd3a0;
+  --text-accent: #0d3d1f;
+  --fill-accent: #5ab89f;
+  --fill-accent-hover: #3ea88e;
+  --on-accent: #ffffff;
+}
+</style>
+</head>
+<body>
+
+<div class="header-top">
+  <button class="settings-button" onclick="openSettings()" title="Settings" aria-label="Settings">
+    <i class="ti ti-settings" aria-hidden="true"></i>
+  </button>
+</div>
+
+<div class="profile-section">
+  <div class="profile-card" onclick="openProfileMenu()" title="Click to edit profile">
+    <div class="profile-avatar-small">
+      <span id="profileInitials">U</span>
+    </div>
+    <div class="profile-info">
+      <p class="profile-name" id="profileDisplayName">User</p>
+      <p class="profile-label">Profile</p>
+    </div>
+  </div>
+</div>
+
+<div id="settingsModal" class="modal-overlay hidden">
+  <div class="modal-card">
+    <div class="modal-header-top">
+      <button class="modal-close-btn" onclick="closeSettings()" aria-label="Back">←</button>
+      <h3 class="modal-header">Settings</h3>
+      <div style="width: 32px;"></div>
+    </div>
+
+    <div class="form-group">
+      <label>Color Theme</label>
+      <div class="options-group">
+        <div class="option-radio" id="themeCh" onclick="selectTheme('cherry')">
+          <input type="radio" name="theme" value="cherry" id="themeChInput">
+          <div class="theme-preview" style="background: #ff6b9d;"></div>
+          <label for="themeChInput">Cherry Blossom</label>
+        </div>
+        <div class="option-radio" id="themeAr" onclick="selectTheme('arctic')">
+          <input type="radio" name="theme" value="arctic" id="themeArInput">
+          <div class="theme-preview" style="background: #0091ff;"></div>
+          <label for="themeArInput">Arctic</label>
+        </div>
+        <div class="option-radio" id="themeCo" onclick="selectTheme('coffee')">
+          <input type="radio" name="theme" value="coffee" id="themeCoInput">
+          <div class="theme-preview" style="background: #6f4e37;"></div>
+          <label for="themeCo">Coffee</label>
+        </div>
+        <div class="option-radio" id="themeJu" onclick="selectTheme('jungle')">
+          <input type="radio" name="theme" value="jungle" id="themeJuInput">
+          <div class="theme-preview" style="background: #2d8659;"></div>
+          <label for="themeJuInput">Jungle</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Font</label>
+      <div class="options-group">
+        <div class="option-radio" id="fontSans" onclick="selectFont('sans')">
+          <input type="radio" name="font" value="sans" id="fontSansInput">
+          <label for="fontSansInput">Sans Serif (Default)</label>
+        </div>
+        <div class="option-radio" id="fontSerif" onclick="selectFont('serif')">
+          <input type="radio" name="font" value="serif" id="fontSerifInput">
+          <label for="fontSerifInput">Serif</label>
+        </div>
+        <div class="option-radio" id="fontMono" onclick="selectFont('mono')">
+          <input type="radio" name="font" value="mono" id="fontMonoInput">
+          <label for="fontMonoInput">Monospace</label>
+        </div>
+        <div class="option-radio" id="fontChanga" onclick="selectFont('changa')">
+          <input type="radio" name="font" value="changa" id="fontChangaInput">
+          <label for="fontChangaInput">Changa One</label>
+        </div>
+        <div class="option-radio" id="fontIndie" onclick="selectFont('indie')">
+          <input type="radio" name="font" value="indie" id="fontIndieInput">
+          <label for="fontIndieInput">Indie Flower</label>
+        </div>
+        <div class="option-radio" id="fontItim" onclick="selectFont('itim')">
+          <input type="radio" name="font" value="itim" id="fontItimInput">
+          <label for="fontItimInput">Itim</label>
+        </div>
+        <div class="option-radio" id="fontAmatic" onclick="selectFont('amatic')">
+          <input type="radio" name="font" value="amatic" id="fontAmaticInput">
+          <label for="fontAmaticInput">Amatic SC</label>
+        </div>
+        <div class="option-radio" id="fontComic" onclick="selectFont('comic')">
+          <input type="radio" name="font" value="comic" id="fontComicInput">
+          <label for="fontComicInput">Comic Neue</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button onclick="closeSettings()">Close</button>
+    </div>
+  </div>
+</div>
+
+<div id="profileMenu" class="modal-overlay hidden">
+  <div class="modal-card">
+    <div class="modal-header-top">
+      <button class="modal-close-btn" onclick="closeProfileMenu()" aria-label="Back">←</button>
+      <h3 class="modal-header">Profiles</h3>
+      <div style="width: 32px;"></div>
+    </div>
+
+    <div id="profileMenuContent">
+      <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">Select a profile or create a new one</p>
+      <div id="profilesList" class="profile-list"></div>
+      <button class="create-profile-button" onclick="showNewProfileForm()">Create new profile</button>
+    </div>
+
+    <div id="editProfileContent" class="hidden">
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" id="profileName" placeholder="Your name">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="profileEmail" placeholder="your.email@example.com">
+      </div>
+      <div class="modal-actions">
+        <button onclick="backToProfileMenu()">Back</button>
+        <button class="save-btn" onclick="saveProfile()">Save</button>
+      </div>
+    </div>
+
+    <div id="newProfileContent" class="hidden">
+      <div class="form-group">
+        <label>Profile name</label>
+        <input type="text" id="newProfileName" placeholder="e.g., Work, Personal">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="newProfileEmail" placeholder="your.email@example.com">
+      </div>
+      <div class="modal-actions">
+        <button onclick="backToProfileMenu()">Back</button>
+        <button class="save-btn" onclick="createNewProfile()">Create</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="noteEditorModal" class="modal-overlay hidden">
+  <div class="modal-card">
+    <div class="modal-header-top">
+      <button class="modal-close-btn" onclick="closeNoteEditor()" aria-label="Back">←</button>
+      <h3 class="modal-header" id="noteEditorTitle">New note</h3>
+      <button class="modal-close-btn hidden" id="deleteNoteBtn" onclick="deleteCurrentNote()" aria-label="Delete note" title="Delete note">
+        <i class="ti ti-trash" aria-hidden="true"></i>
+      </button>
+    </div>
+    <div class="form-group">
+      <label>Title</label>
+      <input type="text" id="noteTitleInput" placeholder="Note title">
+    </div>
+    <div class="form-group">
+      <label>Content</label>
+      <textarea id="noteContentInput" class="note-textarea" placeholder="Write your note..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button onclick="closeNoteEditor()">Cancel</button>
+      <button class="save-btn" onclick="saveCurrentNote()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="app-container">
+  <div id="homeScreen" class="home-screen">
+    <div class="home-header">
+      <h1>Task, Calendar & Notes</h1>
+      <p>Organize your tasks, see them in a calendar view, and jot down notes</p>
+    </div>
+    <div class="options-grid">
+      <div class="option-card" onclick="switchView('calendar')">
+        <div class="option-icon"><i class="ti ti-calendar" aria-hidden="true"></i></div>
+        <h2>View calendar</h2>
+        <p>See your tasks by date</p>
+      </div>
+      <div class="option-card" onclick="switchView('todolist')">
+        <div class="option-icon"><i class="ti ti-checkbox" aria-hidden="true"></i></div>
+        <h2>To-do lists</h2>
+        <p>Manage your tasks</p>
+      </div>
+      <div class="option-card" onclick="switchView('notes')">
+        <div class="option-icon"><i class="ti ti-notes" aria-hidden="true"></i></div>
+        <h2>Notes</h2>
+        <p>Write down your thoughts</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="calendarScreen" class="hidden">
+    <div class="header-bar">
+      <button onclick="switchView('home')" aria-label="Back to home">←</button>
+      <h2>Calendar</h2>
+      <div style="width: 32px;"></div>
+    </div>
+    <p style="color: var(--text-secondary); text-align: center; font-size: 14px;">Calendar view coming next! Tasks grouped by date will appear here.</p>
+  </div>
+
+  <div id="todolistScreen" class="hidden">
+    <div class="header-bar">
+      <button onclick="switchView('home')" aria-label="Back to home">←</button>
+      <h2>To-do lists</h2>
+      <div style="width: 32px;"></div>
+    </div>
+    <p style="color: var(--text-secondary); text-align: center; font-size: 14px;">To-do list manager coming next! Add and manage your tasks here.</p>
+  </div>
+
+  <div id="notesScreen" class="hidden">
+    <div class="header-bar">
+      <button onclick="switchView('home')" aria-label="Back to home">←</button>
+      <h2>Notes</h2>
+      <button onclick="openNoteEditor()" aria-label="New note" title="New note">
+        <i class="ti ti-plus" aria-hidden="true"></i>
+      </button>
+    </div>
+    <div id="notesList" class="notes-list"></div>
+    <p id="notesEmptyState" class="notes-empty hidden">No notes yet. Tap + to create one.</p>
+  </div>
+</div>
+
+<script>
+function getSettings() {
+  const saved = localStorage.getItem('appSettings');
+  return saved ? JSON.parse(saved) : { theme: 'cherry', font: 'sans' };
+}
+
+function saveSettings(settings) {
+  localStorage.setItem('appSettings', JSON.stringify(settings));
+  applySettings(settings);
+}
+
+function applySettings(settings) {
+  document.body.classList.remove('theme-cherry', 'theme-arctic', 'theme-coffee', 'theme-jungle');
+  document.body.classList.add('theme-' + settings.theme);
+
+  document.body.classList.remove('font-serif', 'font-mono', 'font-changa', 'font-indie', 'font-itim', 'font-amatic', 'font-comic');
+  if (settings.font !== 'sans') {
+    document.body.classList.add('font-' + settings.font);
+  }
+}
+
+function openSettings() {
+  const settings = getSettings();
+  document.getElementById('themeChInput').checked = settings.theme === 'cherry';
+  document.getElementById('themeArInput').checked = settings.theme === 'arctic';
+  document.getElementById('themeCoInput').checked = settings.theme === 'coffee';
+  document.getElementById('themeJuInput').checked = settings.theme === 'jungle';
+
+  updateThemeRadios(settings.theme);
+
+  document.getElementById('fontSansInput').checked = settings.font === 'sans';
+  document.getElementById('fontSerifInput').checked = settings.font === 'serif';
+  document.getElementById('fontMonoInput').checked = settings.font === 'mono';
+  document.getElementById('fontChangaInput').checked = settings.font === 'changa';
+  document.getElementById('fontIndieInput').checked = settings.font === 'indie';
+  document.getElementById('fontItimInput').checked = settings.font === 'itim';
+  document.getElementById('fontAmaticInput').checked = settings.font === 'amatic';
+  document.getElementById('fontComicInput').checked = settings.font === 'comic';
+
+  updateFontRadios(settings.font);
+
+  document.getElementById('settingsModal').classList.remove('hidden');
+}
+
+function closeSettings() {
+  document.getElementById('settingsModal').classList.add('hidden');
+}
+
+function selectTheme(theme) {
+  const settings = getSettings();
+  settings.theme = theme;
+  saveSettings(settings);
+  updateThemeRadios(theme);
+}
+
+function selectFont(font) {
+  const settings = getSettings();
+  settings.font = font;
+  saveSettings(settings);
+  updateFontRadios(font);
+}
+
+function updateThemeRadios(theme) {
+  document.getElementById('themeCh').classList.toggle('selected', theme === 'cherry');
+  document.getElementById('themeAr').classList.toggle('selected', theme === 'arctic');
+  document.getElementById('themeCo').classList.toggle('selected', theme === 'coffee');
+  document.getElementById('themeJu').classList.toggle('selected', theme === 'jungle');
+}
+
+function updateFontRadios(font) {
+  document.getElementById('fontSans').classList.toggle('selected', font === 'sans');
+  document.getElementById('fontSerif').classList.toggle('selected', font === 'serif');
+  document.getElementById('fontMono').classList.toggle('selected', font === 'mono');
+  document.getElementById('fontChanga').classList.toggle('selected', font === 'changa');
+  document.getElementById('fontIndie').classList.toggle('selected', font === 'indie');
+  document.getElementById('fontItim').classList.toggle('selected', font === 'itim');
+  document.getElementById('fontAmatic').classList.toggle('selected', font === 'amatic');
+  document.getElementById('fontComic').classList.toggle('selected', font === 'comic');
+}
+
+function getAllProfiles() {
+  const saved = localStorage.getItem('allProfiles');
+  if (!saved) {
+    const defaultProfiles = [{ id: 'default', name: 'User', email: '' }];
+    localStorage.setItem('allProfiles', JSON.stringify(defaultProfiles));
+    localStorage.setItem('currentProfileId', 'default');
+    return defaultProfiles;
+  }
+  return JSON.parse(saved);
+}
+
+function getCurrentProfileId() {
+  return localStorage.getItem('currentProfileId') || 'default';
+}
+
+function getCurrentProfile() {
+  const id = getCurrentProfileId();
+  const profiles = getAllProfiles();
+  return profiles.find(p => p.id === id) || profiles[0];
+}
+
+function saveProfileToStorage(profile) {
+  const profiles = getAllProfiles();
+  const index = profiles.findIndex(p => p.id === profile.id);
+  if (index !== -1) {
+    profiles[index] = profile;
+  } else {
+    profiles.push(profile);
+  }
+  localStorage.setItem('allProfiles', JSON.stringify(profiles));
+  updateProfileDisplay();
+  renderProfilesList();
+}
+
+function setCurrentProfile(profileId) {
+  localStorage.setItem('currentProfileId', profileId);
+  updateProfileDisplay();
+  renderProfilesList();
+}
+
+function updateProfileDisplay() {
+  const profile = getCurrentProfile();
+  const initials = profile.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'U';
+  document.getElementById('profileInitials').textContent = initials;
+  document.getElementById('profileDisplayName').textContent = profile.name;
+}
+
+function renderProfilesList() {
+  const profiles = getAllProfiles();
+  const currentId = getCurrentProfileId();
+  const list = document.getElementById('profilesList');
+  list.innerHTML = profiles.map(profile => `
+    <div class="profile-item ${profile.id === currentId ? 'active' : ''}">
+      <div class="profile-item-avatar">${profile.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}</div>
+      <div class="profile-item-details">
+        <div class="profile-item-name">${profile.name}</div>
+        ${profile.email ? `<div class="profile-item-email">${profile.email}</div>` : ''}
+      </div>
+      <div class="profile-item-actions">
+        <button class="action-button select-btn" onclick="setCurrentProfile('${profile.id}')">Select profile</button>
+        <button class="action-button" onclick="editProfileModal('${profile.id}')">Edit</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openProfileMenu() {
+  renderProfilesList();
+  document.getElementById('profileMenuContent').classList.remove('hidden');
+  document.getElementById('editProfileContent').classList.add('hidden');
+  document.getElementById('newProfileContent').classList.add('hidden');
+  document.getElementById('profileMenu').classList.remove('hidden');
+}
+
+function closeProfileMenu() {
+  document.getElementById('profileMenu').classList.add('hidden');
+}
+
+function showNewProfileForm() {
+  document.getElementById('profileMenuContent').classList.add('hidden');
+  document.getElementById('newProfileContent').classList.remove('hidden');
+  document.getElementById('editProfileContent').classList.add('hidden');
+  document.getElementById('newProfileName').value = '';
+  document.getElementById('newProfileEmail').value = '';
+}
+
+function editProfileModal(profileId) {
+  const profiles = getAllProfiles();
+  const profile = profiles.find(p => p.id === profileId);
+  if (profile) {
+    document.getElementById('profileName').value = profile.name;
+    document.getElementById('profileEmail').value = profile.email;
+    document.getElementById('profileName').dataset.profileId = profileId;
+    document.getElementById('profileMenuContent').classList.add('hidden');
+    document.getElementById('editProfileContent').classList.remove('hidden');
+    document.getElementById('newProfileContent').classList.add('hidden');
+  }
+}
+
+function backToProfileMenu() {
+  document.getElementById('profileMenuContent').classList.remove('hidden');
+  document.getElementById('editProfileContent').classList.add('hidden');
+  document.getElementById('newProfileContent').classList.add('hidden');
+  renderProfilesList();
+}
+
+function saveProfile() {
+  const profileId = document.getElementById('profileName').dataset.profileId;
+  const profile = {
+    id: profileId,
+    name: document.getElementById('profileName').value || 'User',
+    email: document.getElementById('profileEmail').value
+  };
+  saveProfileToStorage(profile);
+  backToProfileMenu();
+}
+
+function createNewProfile() {
+  const name = document.getElementById('newProfileName').value.trim();
+  if (!name) {
+    alert('Please enter a profile name');
+    return;
+  }
+  const id = 'profile_' + Date.now();
+  const profile = {
+    id: id,
+    name: name,
+    email: document.getElementById('newProfileEmail').value
+  };
+  saveProfileToStorage(profile);
+  setCurrentProfile(id);
+  backToProfileMenu();
+}
+
+function getNotes() {
+  const saved = localStorage.getItem('appNotes');
+  return saved ? JSON.parse(saved) : [];
+}
+
+function saveNotesToStorage(notes) {
+  localStorage.setItem('appNotes', JSON.stringify(notes));
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str || '';
+  return div.innerHTML;
+}
+
+function formatNoteDate(timestamp) {
+  const date = new Date(timestamp);
+  return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) + ' · ' + date.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+}
+
+let currentNoteId = null;
+
+function renderNotesList() {
+  const notes = getNotes().slice().sort((a, b) => b.updatedAt - a.updatedAt);
+  const list = document.getElementById('notesList');
+  const emptyState = document.getElementById('notesEmptyState');
+  if (notes.length === 0) {
+    list.innerHTML = '';
+    emptyState.classList.remove('hidden');
+    return;
+  }
+  emptyState.classList.add('hidden');
+  list.innerHTML = notes.map(note => `
+    <div class="note-card" onclick="openNoteEditor('${note.id}')">
+      <p class="note-card-title">${escapeHtml(note.title) || 'Untitled note'}</p>
+      <p class="note-card-snippet">${escapeHtml(note.content)}</p>
+      <p class="note-card-date">${formatNoteDate(note.updatedAt)}</p>
+    </div>
+  `).join('');
+}
+
+function openNoteEditor(noteId) {
+  currentNoteId = noteId || null;
+  const deleteBtn = document.getElementById('deleteNoteBtn');
+  if (currentNoteId) {
+    const note = getNotes().find(n => n.id === currentNoteId);
+    document.getElementById('noteEditorTitle').textContent = 'Edit note';
+    document.getElementById('noteTitleInput').value = note ? note.title : '';
+    document.getElementById('noteContentInput').value = note ? note.content : '';
+    deleteBtn.classList.remove('hidden');
+  } else {
+    document.getElementById('noteEditorTitle').textContent = 'New note';
+    document.getElementById('noteTitleInput').value = '';
+    document.getElementById('noteContentInput').value = '';
+    deleteBtn.classList.add('hidden');
+  }
+  document.getElementById('noteEditorModal').classList.remove('hidden');
+}
+
+function closeNoteEditor() {
+  document.getElementById('noteEditorModal').classList.add('hidden');
+  currentNoteId = null;
+}
+
+function saveCurrentNote() {
+  const title = document.getElementById('noteTitleInput').value.trim();
+  const content = document.getElementById('noteContentInput').value.trim();
+  if (!title && !content) {
+    closeNoteEditor();
+    return;
+  }
+  const notes = getNotes();
+  if (currentNoteId) {
+    const index = notes.findIndex(n => n.id === currentNoteId);
+    if (index !== -1) {
+      notes[index].title = title;
+      notes[index].content = content;
+      notes[index].updatedAt = Date.now();
+    }
+  } else {
+    notes.push({
+      id: 'note_' + Date.now(),
+      title: title,
+      content: content,
+      updatedAt: Date.now()
+    });
+  }
+  saveNotesToStorage(notes);
+  renderNotesList();
+  closeNoteEditor();
+}
+
+function deleteCurrentNote() {
+  if (!currentNoteId) return;
+  if (!confirm('Delete this note?')) return;
+  const notes = getNotes().filter(n => n.id !== currentNoteId);
+  saveNotesToStorage(notes);
+  renderNotesList();
+  closeNoteEditor();
+}
+
+function switchView(view) {
+  document.getElementById('homeScreen').classList.toggle('hidden', view !== 'home');
+  document.getElementById('calendarScreen').classList.toggle('hidden', view !== 'calendar');
+  document.getElementById('todolistScreen').classList.toggle('hidden', view !== 'todolist');
+  document.getElementById('notesScreen').classList.toggle('hidden', view !== 'notes');
+  if (view === 'notes') {
+    renderNotesList();
+  }
+}
+
+updateProfileDisplay();
+applySettings(getSettings());
+</script>
+</body>
+</html>
