@@ -159,6 +159,8 @@ button, input, textarea, select { font-family: inherit; }
 .todo-date-input { width: 130px; flex-shrink: 0; border: 0.5px solid var(--border-strong); background: var(--surface-1); border-radius: 10px; padding: 12px 10px; font-size: 14px; color: var(--text-primary); text-align: center; }
 .todo-date-input:focus { outline: none; border-color: var(--border-accent); box-shadow: 0 0 0 2px var(--bg-accent); }
 .todo-date-input::placeholder { color: var(--text-secondary); }
+.todo-delete-btn { flex-shrink: 0; display: flex; align-items: center; justify-content: center; padding: 12px; border: 0.5px solid var(--border-strong); background: var(--surface-1); border-radius: 10px; cursor: pointer; color: var(--text-secondary); }
+.todo-delete-btn:hover { background: var(--surface-2); border-color: var(--border-stronger); color: var(--text-primary); }
 .todo-items-list { display: flex; flex-direction: column; gap: 8px; max-width: 700px; margin: 0 auto 1rem; }
 .todo-item-row { display: flex; align-items: center; gap: 10px; background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 8px; padding: 10px 12px; }
 .todo-item-row.todo-sub-item { margin-left: 32px; background: var(--surface-0); }
@@ -514,11 +516,11 @@ body.theme-jungle {
     <div class="header-bar">
       <button class="back-arrow-lg" onclick="closeTodoEditor()" aria-label="Back to to-do lists">←</button>
       <div style="flex: 1;"></div>
-      <button onclick="deleteCurrentTodoList()" aria-label="Delete list" title="Delete list"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
     </div>
     <div class="todo-header-row">
       <input type="text" id="todoTitleInput" class="todo-title-input" placeholder="List title" oninput="updateTodoTitle(this.value)">
       <input type="text" id="todoDateInput" class="todo-date-input" placeholder="MM/DD/YYYY" maxlength="10" inputmode="numeric" oninput="handleTodoDateInput(this)" onblur="updateTodoDate(this.value)">
+      <button class="todo-delete-btn" onclick="deleteCurrentTodoList()" aria-label="Delete list" title="Delete list"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
     </div>
     <div id="todoItemsList" class="todo-items-list"></div>
     <div class="todo-add-row">
@@ -541,11 +543,11 @@ body.theme-jungle {
     <div class="header-bar">
       <button class="back-arrow-lg" onclick="closeNoteEditor()" aria-label="Back to notes">←</button>
       <div style="flex: 1;"></div>
-      <button onclick="deleteCurrentNote()" aria-label="Delete note" title="Delete note"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
     </div>
     <div class="todo-header-row">
       <input type="text" id="noteTitleInput" class="todo-title-input" placeholder="Note title" oninput="updateNoteTitle(this.value)">
       <input type="text" id="noteDateInput" class="todo-date-input" placeholder="MM/DD/YYYY" maxlength="10" inputmode="numeric" oninput="handleNoteDateInput(this)" onblur="updateNoteDate(this.value)">
+      <button class="todo-delete-btn" onclick="deleteCurrentNote()" aria-label="Delete note" title="Delete note"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
     </div>
     <div class="note-canvas-wrapper">
       <div id="noteTextArea" class="note-textarea-full is-empty" contenteditable="true" data-placeholder="Write your note..." oninput="handleNoteTextInput(this)" onblur="saveNoteSelection()"></div>
