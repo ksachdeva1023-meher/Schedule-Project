@@ -157,6 +157,26 @@ button, input, textarea, select { font-family: inherit; }
 .hour-input { width: 100%; padding: 6px 10px; border: 0.5px solid var(--border-strong); border-radius: var(--radius); font-size: 13px; background: var(--surface-1); color: var(--text-primary); }
 .hour-input:focus { outline: none; border-color: var(--border-accent); box-shadow: 0 0 0 2px var(--bg-accent); }
 
+.create-list-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; max-width: 700px; margin: 0 auto 1.5rem; padding: 14px; border-radius: 12px; border: none; background: var(--fill-accent); color: var(--on-accent); font-size: 14px; font-weight: 500; cursor: pointer; }
+.create-list-btn:hover { background: var(--fill-accent-hover); }
+.todo-header-row { display: flex; gap: 12px; align-items: flex-start; max-width: 700px; margin: 0 auto 1.5rem; }
+.todo-title-input { flex: 1; border: 0.5px solid var(--border-strong); background: var(--surface-1); border-radius: 10px; padding: 12px 14px; font-size: 18px; font-weight: 500; color: var(--text-primary); min-width: 0; }
+.todo-title-input:focus { outline: none; border-color: var(--border-accent); box-shadow: 0 0 0 2px var(--bg-accent); }
+.todo-title-input::placeholder { color: var(--text-secondary); font-weight: 400; }
+.todo-date-input { width: 130px; flex-shrink: 0; border: 0.5px solid var(--border-strong); background: var(--surface-1); border-radius: 10px; padding: 12px 10px; font-size: 14px; color: var(--text-primary); text-align: center; }
+.todo-date-input:focus { outline: none; border-color: var(--border-accent); box-shadow: 0 0 0 2px var(--bg-accent); }
+.todo-date-input::placeholder { color: var(--text-secondary); }
+.todo-items-list { display: flex; flex-direction: column; gap: 8px; max-width: 700px; margin: 0 auto 1rem; }
+.todo-item-row { display: flex; align-items: center; gap: 10px; background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 8px; padding: 10px 12px; }
+.todo-item-row.todo-sub-item { margin-left: 32px; background: var(--surface-0); }
+.todo-item-row input[type="checkbox"] { cursor: pointer; flex-shrink: 0; }
+.todo-item-text { flex: 1; border: none; background: transparent; font-size: 14px; color: var(--text-primary); padding: 4px 2px; min-width: 0; }
+.todo-item-text:focus { outline: none; }
+.todo-item-row.completed .todo-item-text { text-decoration: line-through; color: var(--text-secondary); }
+.todo-add-row { display: flex; gap: 10px; max-width: 700px; margin: 0 auto; }
+.todo-add-btn { flex: 1; padding: 10px 14px; border-radius: var(--radius); border: 0.5px solid var(--border-strong); background: var(--surface-1); color: var(--text-primary); cursor: pointer; font-size: 13px; font-weight: 500; }
+.todo-add-btn:hover { background: var(--surface-2); border-color: var(--border-stronger); }
+
 body.font-serif { --font-primary: 'Georgia', 'Times New Roman', serif; }
 body.font-mono { --font-primary: 'Courier New', 'Courier', monospace; }
 body.font-changa { --font-primary: 'Changa One', sans-serif; }
@@ -491,7 +511,28 @@ body.theme-jungle {
       <h2>To-do lists</h2>
       <div style="width: 32px;"></div>
     </div>
-    <p style="color: var(--text-secondary); text-align: center; font-size: 14px;">To-do list manager coming next! Add and manage your tasks here.</p>
+    <button class="create-list-btn" onclick="createNewTodoList()">
+      <i class="ti ti-plus" aria-hidden="true"></i> Create a new to-do list
+    </button>
+    <div id="todoListsContainer" class="notes-list"></div>
+    <p id="todoListsEmptyState" class="notes-empty hidden">No to-do lists yet.</p>
+  </div>
+
+  <div id="todoEditorScreen" class="hidden">
+    <div class="header-bar">
+      <button onclick="closeTodoEditor()" aria-label="Back to to-do lists">←</button>
+      <h2>To-do list</h2>
+      <button onclick="deleteCurrentTodoList()" aria-label="Delete list" title="Delete list"><i class="ti ti-trash" aria-hidden="true"></i></button>
+    </div>
+    <div class="todo-header-row">
+      <input type="text" id="todoTitleInput" class="todo-title-input" placeholder="List title" oninput="updateTodoTitle(this.value)">
+      <input type="text" id="todoDateInput" class="todo-date-input" placeholder="MM/DD/YYYY" maxlength="10" inputmode="numeric" oninput="handleTodoDateInput(this)" onblur="updateTodoDate(this.value)">
+    </div>
+    <div id="todoItemsList" class="todo-items-list"></div>
+    <div class="todo-add-row">
+      <button class="todo-add-btn" onclick="addTodoItem()">+ Add checkbox</button>
+      <button class="todo-add-btn" onclick="addTodoSubItem()">+ Add sub-checkbox</button>
+    </div>
   </div>
 
   <div id="notesScreen" class="hidden">
@@ -938,16 +979,22 @@ function saveDayTitle(value) {
 
 function openImportPicker() {
   const notes = getNotes();
-  const list = document.getElementById('importPickerList');
-  list.innerHTML = notes.length
-    ? notes.map(n => `
-        <div class="profile-item" style="cursor: pointer;" onclick="importItem('note', '${n.id}')">
-          <div class="profile-item-details">
-            <div class="profile-item-name">${escapeHtml(n.title) || 'Untitled note'}</div>
-          </div>
-        </div>
-      `).join('')
-    : '<p class="day-empty-tasks">You don\'t have any notes yet.</p>';
+  const todoLists = getTodoLists();
+  const noteItems = notes.map(n => `
+    <div class="profile-item" style="cursor: pointer;" onclick="importItem('note', '${n.id}')">
+      <div class="profile-item-details">
+        <div class="profile-item-name">${escapeHtml(n.title) || 'Untitled note'}</div>
+      </div>
+    </div>
+  `).join('');
+  const todoItems = todoLists.map(t => `
+    <div class="profile-item" style="cursor: pointer;" onclick="importItem('todo', '${t.id}')">
+      <div class="profile-item-details">
+        <div class="profile-item-name">${escapeHtml(t.title) || 'Untitled list'}</div>
+      </div>
+    </div>
+  `).join('');
+  document.getElementById('importPickerList').innerHTML = (noteItems + todoItems) || '<p class="day-empty-tasks">You don\'t have any notes or to-do lists yet.</p>';
   document.getElementById('importPickerModal').classList.remove('hidden');
 }
 
@@ -975,6 +1022,8 @@ function removeLinkedItem(type, id) {
 function openLinkedItem(type, id) {
   if (type === 'note') {
     openNoteEditor(id);
+  } else if (type === 'todo') {
+    openTodoEditor(id, 'dayview');
   }
 }
 
@@ -986,6 +1035,9 @@ function renderLinkedItems() {
     if (l.type === 'note') {
       const note = getNotes().find(n => n.id === l.id);
       if (note) label = note.title || 'Untitled note';
+    } else if (l.type === 'todo') {
+      const todoList = getTodoLists().find(t => t.id === l.id);
+      if (todoList) label = todoList.title || 'Untitled list';
     }
     return `
       <div class="linked-item-chip">
@@ -1053,6 +1105,213 @@ function deleteDayTask(id) {
   renderDayView();
 }
 
+function escapeAttr(str) {
+  return (str || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+}
+
+function getTodoLists() {
+  const saved = localStorage.getItem('todoLists');
+  return saved ? JSON.parse(saved) : [];
+}
+
+function saveTodoListsToStorage(lists) {
+  localStorage.setItem('todoLists', JSON.stringify(lists));
+}
+
+function getCurrentTodoList() {
+  return getTodoLists().find(l => l.id === currentTodoListId);
+}
+
+let currentTodoListId = null;
+
+function renderTodoListsScreen() {
+  const lists = getTodoLists().slice().sort((a, b) => b.updatedAt - a.updatedAt);
+  const container = document.getElementById('todoListsContainer');
+  const emptyState = document.getElementById('todoListsEmptyState');
+  if (!lists.length) {
+    container.innerHTML = '';
+    emptyState.classList.remove('hidden');
+    return;
+  }
+  emptyState.classList.add('hidden');
+  container.innerHTML = lists.map(list => {
+    const total = list.items.length;
+    const done = list.items.filter(i => i.completed).length;
+    return `
+      <div class="note-card" onclick="openTodoEditor('${list.id}')">
+        <p class="note-card-title">${escapeHtml(list.title) || 'Untitled list'}</p>
+        <p class="note-card-snippet">${done} of ${total} done${list.date ? ' · ' + escapeHtml(list.date) : ''}</p>
+      </div>
+    `;
+  }).join('');
+}
+
+function createNewTodoList() {
+  const lists = getTodoLists();
+  const newList = {
+    id: 'todo_' + Date.now(),
+    title: '',
+    date: '',
+    items: [{ id: 'item_' + Date.now(), text: '', completed: false, parentId: null }],
+    updatedAt: Date.now()
+  };
+  lists.push(newList);
+  saveTodoListsToStorage(lists);
+  openTodoEditor(newList.id);
+}
+
+let todoEditorReturnTo = 'todolist';
+
+function openTodoEditor(id, returnTo) {
+  currentTodoListId = id;
+  todoEditorReturnTo = returnTo || 'todolist';
+  renderTodoEditor();
+  document.getElementById('homeScreen').classList.add('hidden');
+  document.getElementById('calendarScreen').classList.add('hidden');
+  document.getElementById('todolistScreen').classList.add('hidden');
+  document.getElementById('notesScreen').classList.add('hidden');
+  document.getElementById('dayViewScreen').classList.add('hidden');
+  document.getElementById('todoEditorScreen').classList.remove('hidden');
+}
+
+function closeTodoEditor() {
+  document.getElementById('todoEditorScreen').classList.add('hidden');
+  currentTodoListId = null;
+  if (todoEditorReturnTo === 'dayview') {
+    document.getElementById('dayViewScreen').classList.remove('hidden');
+  } else {
+    document.getElementById('todolistScreen').classList.remove('hidden');
+    renderTodoListsScreen();
+  }
+}
+
+function deleteCurrentTodoList() {
+  if (!confirm('Delete this to-do list?')) return;
+  const lists = getTodoLists().filter(l => l.id !== currentTodoListId);
+  saveTodoListsToStorage(lists);
+  closeTodoEditor();
+}
+
+function todoItemHtml(item, isSub) {
+  return `
+    <div class="todo-item-row ${isSub ? 'todo-sub-item' : ''} ${item.completed ? 'completed' : ''}">
+      <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleTodoItem('${item.id}')">
+      <input type="text" class="todo-item-text" value="${escapeAttr(item.text)}" placeholder="List item" oninput="updateTodoItemText('${item.id}', this.value)">
+      <button class="day-task-delete" onclick="deleteTodoItem('${item.id}')" aria-label="Delete item"><i class="ti ti-x" aria-hidden="true"></i></button>
+    </div>
+  `;
+}
+
+function renderTodoEditor() {
+  const list = getCurrentTodoList();
+  if (!list) return;
+  document.getElementById('todoTitleInput').value = list.title || '';
+  document.getElementById('todoDateInput').value = list.date || '';
+
+  const topItems = list.items.filter(i => !i.parentId);
+  document.getElementById('todoItemsList').innerHTML = topItems.map(item => {
+    const subItems = list.items.filter(i => i.parentId === item.id);
+    return todoItemHtml(item, false) + subItems.map(si => todoItemHtml(si, true)).join('');
+  }).join('');
+}
+
+function updateTodoTitle(value) {
+  const lists = getTodoLists();
+  const list = lists.find(l => l.id === currentTodoListId);
+  if (list) {
+    list.title = value;
+    list.updatedAt = Date.now();
+    saveTodoListsToStorage(lists);
+  }
+}
+
+function formatDateInput(value) {
+  const digits = value.replace(/\D/g, '').slice(0, 8);
+  if (digits.length > 4) {
+    return digits.slice(0, 2) + '/' + digits.slice(2, 4) + '/' + digits.slice(4);
+  } else if (digits.length > 2) {
+    return digits.slice(0, 2) + '/' + digits.slice(2);
+  }
+  return digits;
+}
+
+function handleTodoDateInput(el) {
+  el.value = formatDateInput(el.value);
+}
+
+function updateTodoDate(value) {
+  const lists = getTodoLists();
+  const list = lists.find(l => l.id === currentTodoListId);
+  if (list) {
+    list.date = value;
+    list.updatedAt = Date.now();
+    saveTodoListsToStorage(lists);
+  }
+}
+
+function updateTodoItemText(itemId, value) {
+  const lists = getTodoLists();
+  const list = lists.find(l => l.id === currentTodoListId);
+  const item = list.items.find(i => i.id === itemId);
+  if (item) {
+    item.text = value;
+    list.updatedAt = Date.now();
+    saveTodoListsToStorage(lists);
+  }
+}
+
+function toggleTodoItem(itemId) {
+  const lists = getTodoLists();
+  const list = lists.find(l => l.id === currentTodoListId);
+  const item = list.items.find(i => i.id === itemId);
+  if (item) {
+    item.completed = !item.completed;
+    list.updatedAt = Date.now();
+    saveTodoListsToStorage(lists);
+    renderTodoEditor();
+  }
+}
+
+function deleteTodoItem(itemId) {
+  const lists = getTodoLists();
+  const list = lists.find(l => l.id === currentTodoListId);
+  list.items = list.items.filter(i => i.id !== itemId && i.parentId !== itemId);
+  list.updatedAt = Date.now();
+  saveTodoListsToStorage(lists);
+  renderTodoEditor();
+}
+
+function focusLastTodoItemInput() {
+  const inputs = document.querySelectorAll('#todoItemsList .todo-item-text');
+  if (inputs.length) inputs[inputs.length - 1].focus();
+}
+
+function addTodoItem() {
+  const lists = getTodoLists();
+  const list = lists.find(l => l.id === currentTodoListId);
+  list.items.push({ id: 'item_' + Date.now(), text: '', completed: false, parentId: null });
+  list.updatedAt = Date.now();
+  saveTodoListsToStorage(lists);
+  renderTodoEditor();
+  focusLastTodoItemInput();
+}
+
+function addTodoSubItem() {
+  const lists = getTodoLists();
+  const list = lists.find(l => l.id === currentTodoListId);
+  const topItems = list.items.filter(i => !i.parentId);
+  if (!topItems.length) {
+    alert('Add a checkbox first before adding a sub-checkbox.');
+    return;
+  }
+  const lastTop = topItems[topItems.length - 1];
+  list.items.push({ id: 'item_' + Date.now(), text: '', completed: false, parentId: lastTop.id });
+  list.updatedAt = Date.now();
+  saveTodoListsToStorage(lists);
+  renderTodoEditor();
+  focusLastTodoItemInput();
+}
+
 function switchView(view) {
   document.getElementById('homeScreen').classList.toggle('hidden', view !== 'home');
   document.getElementById('calendarScreen').classList.toggle('hidden', view !== 'calendar');
@@ -1063,6 +1322,9 @@ function switchView(view) {
   }
   if (view === 'calendar') {
     renderCalendar();
+  }
+  if (view === 'todolist') {
+    renderTodoListsScreen();
   }
 }
 
