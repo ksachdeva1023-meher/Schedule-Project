@@ -48,6 +48,12 @@ html, body {
 .option-card:hover { border-color: var(--border-stronger); background: var(--surface-2); }
 .option-card:active { transform: scale(0.98); }
 .option-icon { font-size: 32px; margin-bottom: 12px; color: var(--text-accent); }
+.calendar-icon-shape { width: 72px; height: 72px; margin: 0 auto 12px; position: relative; }
+.calendar-icon-rings { position: absolute; top: -7px; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 16px; z-index: 2; }
+.calendar-icon-rings span { width: 8px; height: 16px; background: var(--text-secondary); border-radius: 4px; display: block; }
+.calendar-icon-top { position: absolute; top: 0; left: 0; right: 0; height: 20px; background: #e6483c; border-radius: 10px 10px 0 0; }
+.calendar-icon-body { position: absolute; top: 20px; left: 0; right: 0; bottom: 0; background: #ffffff; border: 2px solid var(--border-strong); border-top: none; border-radius: 0 0 10px 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.08); }
+.calendar-icon-body span { font-size: 26px; font-weight: 700; color: #2d2d2d; font-family: var(--font-primary); }
 .option-card h2 { font-size: 16px; font-weight: 500; color: var(--text-primary); margin: 0 0 8px; }
 .option-card p { font-size: 13px; color: var(--text-secondary); margin: 0; }
 .hidden { display: none !important; }
@@ -101,6 +107,33 @@ html, body {
 .notes-empty { color: var(--text-secondary); text-align: center; font-size: 14px; margin-top: 2rem; }
 .note-textarea { width: 100%; min-height: 180px; padding: 10px 12px; border: 0.5px solid var(--border-strong); border-radius: var(--radius); font-size: 14px; background: var(--surface-1); color: var(--text-primary); font-family: inherit; resize: vertical; }
 .note-textarea:focus { outline: none; border-color: var(--border-accent); box-shadow: 0 0 0 2px var(--bg-accent); }
+
+.calendar-nav { display: flex; align-items: center; justify-content: space-between; max-width: 700px; margin: 0 auto 12px; }
+.calendar-nav-btn { background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 8px; padding: 6px 14px; cursor: pointer; font-size: 16px; color: var(--text-primary); }
+.calendar-nav-btn:hover { background: var(--surface-2); border-color: var(--border-stronger); }
+.calendar-nav h3 { margin: 0; font-size: 16px; font-weight: 500; color: var(--text-primary); }
+.calendar-today-btn { background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 8px; padding: 6px 12px; cursor: pointer; font-size: 13px; color: var(--text-primary); }
+.calendar-today-btn:hover { background: var(--surface-2); border-color: var(--border-stronger); }
+.calendar-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; max-width: 700px; margin: 0 auto 6px; text-align: center; font-size: 12px; color: var(--text-secondary); font-weight: 500; }
+.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; max-width: 700px; margin: 0 auto; }
+.calendar-day { aspect-ratio: 1; background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 8px; padding: 6px; cursor: pointer; display: flex; flex-direction: column; align-items: flex-start; transition: all 0.2s; position: relative; }
+.calendar-day:hover { background: var(--surface-2); border-color: var(--border-stronger); }
+.calendar-day.empty { background: transparent; border: none; cursor: default; }
+.calendar-day.today { border: 2px solid var(--fill-accent); }
+.calendar-day-num { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+.calendar-day-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--fill-accent); position: absolute; bottom: 6px; right: 6px; }
+.day-tasks-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; max-height: 300px; overflow-y: auto; }
+.day-task-item { display: flex; align-items: center; gap: 8px; background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 8px; padding: 8px 10px; }
+.day-task-item input[type="checkbox"] { cursor: pointer; flex-shrink: 0; }
+.day-task-text { flex: 1; font-size: 14px; color: var(--text-primary); word-break: break-word; }
+.day-task-text.completed { text-decoration: line-through; color: var(--text-secondary); }
+.day-task-delete { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 16px; padding: 2px 6px; flex-shrink: 0; }
+.day-task-add { display: flex; gap: 8px; }
+.day-task-add input { flex: 1; padding: 10px 12px; border: 0.5px solid var(--border-strong); border-radius: var(--radius); font-size: 14px; background: var(--surface-1); color: var(--text-primary); }
+.day-task-add input:focus { outline: none; border-color: var(--border-accent); box-shadow: 0 0 0 2px var(--bg-accent); }
+.day-task-add button { background: var(--fill-accent); color: var(--on-accent); border: none; border-radius: var(--radius); padding: 0 14px; cursor: pointer; font-size: 16px; }
+.day-task-add button:hover { background: var(--fill-accent-hover); }
+.day-empty-tasks { color: var(--text-secondary); font-size: 13px; text-align: center; padding: 12px 0; }
 
 body.font-serif { --font-primary: 'Georgia', 'Times New Roman', serif; }
 body.font-mono { --font-primary: 'Courier New', 'Courier', monospace; }
@@ -319,6 +352,21 @@ body.theme-jungle {
   </div>
 </div>
 
+<div id="dayModal" class="modal-overlay hidden">
+  <div class="modal-card">
+    <div class="modal-header-top">
+      <button class="modal-close-btn" onclick="closeDayModal()" aria-label="Back">←</button>
+      <h3 class="modal-header" id="dayModalTitle">Date</h3>
+      <div style="width: 32px;"></div>
+    </div>
+    <div id="dayTasksList" class="day-tasks-list"></div>
+    <div class="day-task-add">
+      <input type="text" id="newDayTaskInput" placeholder="Add a task..." onkeydown="if(event.key==='Enter') addDayTask()">
+      <button onclick="addDayTask()" aria-label="Add task"><i class="ti ti-plus" aria-hidden="true"></i></button>
+    </div>
+  </div>
+</div>
+
 <div id="noteEditorModal" class="modal-overlay hidden">
   <div class="modal-card">
     <div class="modal-header-top">
@@ -351,7 +399,11 @@ body.theme-jungle {
     </div>
     <div class="options-grid">
       <div class="option-card" onclick="switchView('calendar')">
-        <div class="option-icon"><i class="ti ti-calendar" aria-hidden="true"></i></div>
+        <div class="calendar-icon-shape">
+          <div class="calendar-icon-rings"><span></span><span></span></div>
+          <div class="calendar-icon-top"></div>
+          <div class="calendar-icon-body"><span id="calendarIconDay"></span></div>
+        </div>
         <h2>View calendar</h2>
         <p>See your tasks by date</p>
       </div>
@@ -372,9 +424,17 @@ body.theme-jungle {
     <div class="header-bar">
       <button onclick="switchView('home')" aria-label="Back to home">←</button>
       <h2>Calendar</h2>
-      <div style="width: 32px;"></div>
+      <button class="calendar-today-btn" onclick="goToToday()">Today</button>
     </div>
-    <p style="color: var(--text-secondary); text-align: center; font-size: 14px;">Calendar view coming next! Tasks grouped by date will appear here.</p>
+    <div class="calendar-nav">
+      <button class="calendar-nav-btn" onclick="changeMonth(-1)" aria-label="Previous month">‹</button>
+      <h3 id="calendarMonthLabel">Month Year</h3>
+      <button class="calendar-nav-btn" onclick="changeMonth(1)" aria-label="Next month">›</button>
+    </div>
+    <div class="calendar-weekdays">
+      <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+    </div>
+    <div id="calendarGrid" class="calendar-grid"></div>
   </div>
 
   <div id="todolistScreen" class="hidden">
@@ -714,6 +774,136 @@ function deleteCurrentNote() {
   closeNoteEditor();
 }
 
+function getTasks() {
+  const saved = localStorage.getItem('appTasks');
+  return saved ? JSON.parse(saved) : [];
+}
+
+function saveTasksToStorage(tasks) {
+  localStorage.setItem('appTasks', JSON.stringify(tasks));
+}
+
+function pad2(n) { return String(n).padStart(2, '0'); }
+
+function dateToStr(year, month, day) {
+  return year + '-' + pad2(month + 1) + '-' + pad2(day);
+}
+
+const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+let calendarViewYear, calendarViewMonth, selectedDayStr;
+
+function initCalendar() {
+  const today = new Date();
+  calendarViewYear = today.getFullYear();
+  calendarViewMonth = today.getMonth();
+}
+
+function changeMonth(delta) {
+  calendarViewMonth += delta;
+  if (calendarViewMonth < 0) { calendarViewMonth = 11; calendarViewYear--; }
+  if (calendarViewMonth > 11) { calendarViewMonth = 0; calendarViewYear++; }
+  renderCalendar();
+}
+
+function goToToday() {
+  const today = new Date();
+  calendarViewYear = today.getFullYear();
+  calendarViewMonth = today.getMonth();
+  renderCalendar();
+}
+
+function renderCalendar() {
+  document.getElementById('calendarMonthLabel').textContent = MONTH_NAMES[calendarViewMonth] + ' ' + calendarViewYear;
+
+  const tasksByDate = {};
+  getTasks().forEach(t => {
+    if (t.date) {
+      if (!tasksByDate[t.date]) tasksByDate[t.date] = [];
+      tasksByDate[t.date].push(t);
+    }
+  });
+
+  const firstDay = new Date(calendarViewYear, calendarViewMonth, 1).getDay();
+  const daysInMonth = new Date(calendarViewYear, calendarViewMonth + 1, 0).getDate();
+  const today = new Date();
+  const todayStr = dateToStr(today.getFullYear(), today.getMonth(), today.getDate());
+
+  let html = '';
+  for (let i = 0; i < firstDay; i++) {
+    html += `<div class="calendar-day empty"></div>`;
+  }
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dateStr = dateToStr(calendarViewYear, calendarViewMonth, day);
+    const hasTasks = tasksByDate[dateStr] && tasksByDate[dateStr].length > 0;
+    const isToday = dateStr === todayStr;
+    html += `
+      <div class="calendar-day ${isToday ? 'today' : ''}" onclick="openDayModal('${dateStr}')">
+        <span class="calendar-day-num">${day}</span>
+        ${hasTasks ? '<span class="calendar-day-dot"></span>' : ''}
+      </div>
+    `;
+  }
+  document.getElementById('calendarGrid').innerHTML = html;
+}
+
+function openDayModal(dateStr) {
+  selectedDayStr = dateStr;
+  const [y, m, d] = dateStr.split('-').map(Number);
+  document.getElementById('dayModalTitle').textContent = MONTH_NAMES[m - 1] + ' ' + d + ', ' + y;
+  document.getElementById('newDayTaskInput').value = '';
+  renderDayTasks();
+  document.getElementById('dayModal').classList.remove('hidden');
+}
+
+function closeDayModal() {
+  document.getElementById('dayModal').classList.add('hidden');
+  renderCalendar();
+}
+
+function renderDayTasks() {
+  const tasks = getTasks().filter(t => t.date === selectedDayStr);
+  const list = document.getElementById('dayTasksList');
+  if (tasks.length === 0) {
+    list.innerHTML = '<p class="day-empty-tasks">No tasks for this day yet.</p>';
+    return;
+  }
+  list.innerHTML = tasks.map(t => `
+    <div class="day-task-item">
+      <input type="checkbox" ${t.completed ? 'checked' : ''} onchange="toggleDayTask('${t.id}')">
+      <span class="day-task-text ${t.completed ? 'completed' : ''}">${escapeHtml(t.text)}</span>
+      <button class="day-task-delete" onclick="deleteDayTask('${t.id}')" aria-label="Delete task"><i class="ti ti-x" aria-hidden="true"></i></button>
+    </div>
+  `).join('');
+}
+
+function addDayTask() {
+  const input = document.getElementById('newDayTaskInput');
+  const text = input.value.trim();
+  if (!text) return;
+  const tasks = getTasks();
+  tasks.push({ id: 'task_' + Date.now(), text: text, date: selectedDayStr, completed: false, createdAt: Date.now() });
+  saveTasksToStorage(tasks);
+  input.value = '';
+  renderDayTasks();
+}
+
+function toggleDayTask(id) {
+  const tasks = getTasks();
+  const task = tasks.find(t => t.id === id);
+  if (task) {
+    task.completed = !task.completed;
+    saveTasksToStorage(tasks);
+    renderDayTasks();
+  }
+}
+
+function deleteDayTask(id) {
+  const tasks = getTasks().filter(t => t.id !== id);
+  saveTasksToStorage(tasks);
+  renderDayTasks();
+}
+
 function switchView(view) {
   document.getElementById('homeScreen').classList.toggle('hidden', view !== 'home');
   document.getElementById('calendarScreen').classList.toggle('hidden', view !== 'calendar');
@@ -722,10 +912,15 @@ function switchView(view) {
   if (view === 'notes') {
     renderNotesList();
   }
+  if (view === 'calendar') {
+    renderCalendar();
+  }
 }
 
+document.getElementById('calendarIconDay').textContent = new Date().getDate();
 updateProfileDisplay();
 applySettings(getSettings());
+initCalendar();
 </script>
 </body>
 </html>
