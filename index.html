@@ -54,6 +54,16 @@ html, body {
 .calendar-icon-top { position: absolute; top: 0; left: 0; right: 0; height: 20px; background: #e6483c; border-radius: 10px 10px 0 0; }
 .calendar-icon-body { position: absolute; top: 20px; left: 0; right: 0; bottom: 0; background: #ffffff; border: 2px solid var(--border-strong); border-top: none; border-radius: 0 0 10px 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.08); }
 .calendar-icon-body span { font-size: 26px; font-weight: 700; color: #2d2d2d; font-family: var(--font-primary); }
+.todo-icon-shape { width: 72px; height: 72px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; }
+.todo-icon-box { width: 56px; height: 56px; background: #ffffff; border: 3px solid var(--border-strong); border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; }
+.todo-icon-check { width: 24px; height: 13px; border-left: 5px solid #3ea88e; border-bottom: 5px solid #3ea88e; transform: rotate(-45deg); margin-top: -4px; }
+.pencil-icon-shape { width: 72px; height: 72px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; }
+.pencil-icon { display: flex; align-items: center; transform: rotate(-45deg); filter: drop-shadow(0 2px 3px rgba(0,0,0,0.12)); }
+.pencil-eraser { width: 10px; height: 18px; background: #f4879a; border: 2px solid var(--border-strong); border-right: none; border-radius: 4px 0 0 4px; }
+.pencil-band { width: 6px; height: 18px; background: #d9d9d9; border-top: 2px solid var(--border-strong); border-bottom: 2px solid var(--border-strong); }
+.pencil-body { width: 30px; height: 18px; background: #f2c14e; border-top: 2px solid var(--border-strong); border-bottom: 2px solid var(--border-strong); }
+.pencil-tip-wood { width: 0; height: 0; border-top: 9px solid transparent; border-bottom: 9px solid transparent; border-left: 12px solid #e8b34d; }
+.pencil-tip-lead { width: 0; height: 0; border-top: 4px solid transparent; border-bottom: 4px solid transparent; border-left: 6px solid #3a2a1a; margin-left: -1px; }
 .option-card h2 { font-size: 16px; font-weight: 500; color: var(--text-primary); margin: 0 0 8px; }
 .option-card p { font-size: 13px; color: var(--text-secondary); margin: 0; }
 .hidden { display: none !important; }
@@ -408,12 +418,22 @@ body.theme-jungle {
         <p>See your tasks by date</p>
       </div>
       <div class="option-card" onclick="switchView('todolist')">
-        <div class="option-icon"><i class="ti ti-checkbox" aria-hidden="true"></i></div>
+        <div class="todo-icon-shape">
+          <div class="todo-icon-box"><div class="todo-icon-check"></div></div>
+        </div>
         <h2>To-do lists</h2>
         <p>Manage your tasks</p>
       </div>
       <div class="option-card" onclick="switchView('notes')">
-        <div class="option-icon"><i class="ti ti-notes" aria-hidden="true"></i></div>
+        <div class="pencil-icon-shape">
+          <div class="pencil-icon">
+            <div class="pencil-eraser"></div>
+            <div class="pencil-band"></div>
+            <div class="pencil-body"></div>
+            <div class="pencil-tip-wood"></div>
+            <div class="pencil-tip-lead"></div>
+          </div>
+        </div>
         <h2>Notes</h2>
         <p>Write down your thoughts</p>
       </div>
