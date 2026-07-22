@@ -32,13 +32,13 @@ button, input, textarea, select { font-family: inherit; }
 .settings-button:hover { border-color: var(--border-stronger); background: var(--surface-2); }
 .settings-button:active { transform: scale(0.95); }
 .profile-section { position: fixed; top: 16px; left: 16px; z-index: 100; }
-.profile-card { background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.2s; min-width: 200px; }
+.profile-card { background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 14px; padding: 18px 24px; display: flex; align-items: center; gap: 16px; cursor: pointer; transition: all 0.2s; min-width: 260px; }
 .profile-card:hover { border-color: var(--border-stronger); background: var(--surface-2); }
 .profile-card:active { transform: scale(0.98); }
-.profile-avatar-small { width: 36px; height: 36px; border-radius: 50%; background: var(--bg-accent); display: flex; align-items: center; justify-content: center; font-weight: 500; font-size: 13px; color: var(--on-accent); flex-shrink: 0; }
+.profile-avatar-small { width: 52px; height: 52px; border-radius: 50%; background: var(--bg-accent); display: flex; align-items: center; justify-content: center; font-weight: 500; font-size: 18px; color: var(--on-accent); flex-shrink: 0; }
 .profile-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.profile-name { font-size: 14px; font-weight: 500; color: var(--text-primary); margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.profile-label { font-size: 11px; color: var(--text-secondary); margin: 0; }
+.profile-name { font-size: 19px; font-weight: 500; color: var(--text-primary); margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.profile-label { font-size: 14px; color: var(--text-secondary); margin: 0; }
 .home-screen { display: flex; flex-direction: column; gap: 4.5rem; align-items: center; margin-top: 5.5rem; }
 .home-header { text-align: center; }
 .home-header h1 { font-size: 38px; font-weight: 500; color: var(--text-primary); margin: 0 0 8px; }
@@ -362,13 +362,13 @@ body.theme-jungle {
       <label>Text and Icon Size</label>
       <div class="options-group">
         <div class="option-radio" id="size1" onclick="selectSize(1)">
-          <label>1 (Regular)</label>
+          <label>1</label>
         </div>
         <div class="option-radio" id="size2" onclick="selectSize(2)">
-          <label>2 (Slightly Larger)</label>
+          <label>2</label>
         </div>
         <div class="option-radio" id="size3" onclick="selectSize(3)">
-          <label>3 (Largest)</label>
+          <label>3</label>
         </div>
       </div>
     </div>
