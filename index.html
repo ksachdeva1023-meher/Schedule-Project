@@ -108,15 +108,9 @@ button, input, textarea, select { font-family: inherit; }
 .create-profile-button:hover { background: var(--fill-accent-hover); }
 
 .notes-list { display: flex; flex-direction: column; gap: 10px; max-width: 700px; margin: 0 auto; }
-.note-card { background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 10px; padding: 14px 16px; cursor: pointer; transition: all 0.2s; }
-.note-card:hover { border-color: var(--border-stronger); background: var(--surface-2); }
-.note-card:active { transform: scale(0.98); }
 .note-card-title { font-size: 15px; font-weight: 500; color: var(--text-primary); margin: 0 0 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .note-card-snippet { font-size: 13px; color: var(--text-secondary); margin: 0 0 6px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; white-space: pre-wrap; }
-.note-card-date { font-size: 11px; color: var(--text-muted); margin: 0; }
 .notes-empty { color: var(--text-secondary); text-align: center; font-size: 14px; margin-top: 2rem; }
-.note-textarea { width: 100%; min-height: 180px; padding: 10px 12px; border: 0.5px solid var(--border-strong); border-radius: var(--radius); font-size: 14px; background: var(--surface-1); color: var(--text-primary); font-family: inherit; resize: vertical; }
-.note-textarea:focus { outline: none; border-color: var(--border-accent); box-shadow: 0 0 0 2px var(--bg-accent); }
 
 .calendar-nav { display: flex; align-items: center; justify-content: space-between; max-width: 700px; margin: 0 auto 12px; }
 .calendar-nav-btn { background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 8px; padding: 6px 14px; cursor: pointer; font-size: 16px; color: var(--text-primary); }
@@ -184,6 +178,19 @@ button, input, textarea, select { font-family: inherit; }
 .todo-list-card-info { flex: 1; min-width: 0; cursor: pointer; }
 .todo-list-delete-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 18px; padding: 6px; flex-shrink: 0; }
 .todo-list-delete-btn:hover { color: var(--text-primary); }
+.note-canvas-wrapper { position: relative; max-width: 700px; margin: 0 auto 1rem; height: 420px; border: 0.5px solid var(--border-strong); border-radius: 10px; overflow: hidden; background: #ffffff; }
+.note-textarea-full { position: absolute; inset: 0; width: 100%; height: 100%; border: none; background: transparent; padding: 16px; font-size: 15px; font-family: inherit; resize: none; }
+.note-textarea-full:focus { outline: none; }
+.note-canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; }
+.note-toolbar { display: flex; align-items: center; gap: 10px; max-width: 700px; margin: 0 auto; position: relative; }
+.note-tool-btn { background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 10px; padding: 10px 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-primary); font-size: 18px; font-weight: 700; min-width: 48px; }
+.note-tool-btn:hover { background: var(--surface-2); border-color: var(--border-stronger); }
+.note-tool-btn.active { border: 2px solid var(--fill-accent); background: var(--bg-accent); }
+.note-color-wrapper { position: relative; }
+.color-drop-swatch { width: 20px; height: 20px; border-radius: 50%; display: block; border: 2px solid var(--border-strong); }
+.color-picker-popup { position: absolute; bottom: 58px; left: 0; background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 12px; padding: 12px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 10; }
+.color-swatch { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
+.color-swatch.selected { border-color: var(--text-primary); }
 
 body.font-serif { --font-primary: 'Georgia', 'Times New Roman', serif; }
 body.font-mono { --font-primary: 'Courier New', 'Courier', monospace; }
@@ -413,30 +420,6 @@ body.theme-jungle {
   </div>
 </div>
 
-<div id="noteEditorModal" class="modal-overlay hidden">
-  <div class="modal-card">
-    <div class="modal-header-top">
-      <button class="modal-close-btn" onclick="closeNoteEditor()" aria-label="Back">←</button>
-      <h3 class="modal-header" id="noteEditorTitle">New note</h3>
-      <button class="modal-close-btn hidden" id="deleteNoteBtn" onclick="deleteCurrentNote()" aria-label="Delete note" title="Delete note">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-      </button>
-    </div>
-    <div class="form-group">
-      <label>Title</label>
-      <input type="text" id="noteTitleInput" placeholder="Note title">
-    </div>
-    <div class="form-group">
-      <label>Content</label>
-      <textarea id="noteContentInput" class="note-textarea" placeholder="Write your note..."></textarea>
-    </div>
-    <div class="modal-actions">
-      <button onclick="closeNoteEditor()">Cancel</button>
-      <button class="save-btn" onclick="saveCurrentNote()">Save</button>
-    </div>
-  </div>
-</div>
-
 <div class="app-container">
   <div id="homeScreen" class="home-screen">
     <div class="home-header">
@@ -541,12 +524,39 @@ body.theme-jungle {
 
   <div id="notesScreen" class="hidden">
     <div class="header-bar">
-      <button onclick="switchView('home')" aria-label="Back to home">←</button>
-      <h2>Notes</h2>
-      <button onclick="openNoteEditor()" aria-label="New note" title="New note">+</button>
+      <button class="back-arrow-lg" onclick="switchView('home')" aria-label="Back to home">←</button>
+      <div style="flex: 1;"></div>
     </div>
+    <button class="create-list-btn" onclick="createNewNote()">+ Create a new note</button>
     <div id="notesList" class="notes-list"></div>
-    <p id="notesEmptyState" class="notes-empty hidden">No notes yet. Tap + to create one.</p>
+    <p id="notesEmptyState" class="notes-empty hidden">No notes yet.</p>
+  </div>
+
+  <div id="noteEditorScreen" class="hidden">
+    <div class="header-bar">
+      <button class="back-arrow-lg" onclick="closeNoteEditor()" aria-label="Back to notes">←</button>
+      <div style="flex: 1;"></div>
+      <button onclick="deleteCurrentNote()" aria-label="Delete note" title="Delete note"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
+    </div>
+    <div class="todo-header-row">
+      <input type="text" id="noteTitleInput" class="todo-title-input" placeholder="Note title" oninput="updateNoteTitle(this.value)">
+      <input type="text" id="noteDateInput" class="todo-date-input" placeholder="MM/DD/YYYY" maxlength="10" inputmode="numeric" oninput="handleNoteDateInput(this)" onblur="updateNoteDate(this.value)">
+    </div>
+    <div class="note-canvas-wrapper">
+      <textarea id="noteTextArea" class="note-textarea-full" placeholder="Write your note..." oninput="updateNoteText(this.value)"></textarea>
+      <canvas id="noteCanvas" class="note-canvas"></canvas>
+    </div>
+    <div class="note-toolbar">
+      <button class="note-tool-btn" id="toolPenBtn" onclick="setNoteTool('pen')" title="Pen" aria-label="Pen">🖊️</button>
+      <button class="note-tool-btn" id="toolHighlighterBtn" onclick="setNoteTool('highlighter')" title="Highlighter" aria-label="Highlighter">🖍️</button>
+      <button class="note-tool-btn" id="toolTextBtn" onclick="setNoteTool('text')" title="Text" aria-label="Text">A</button>
+      <div class="note-color-wrapper">
+        <button class="note-tool-btn" id="toolColorBtn" onclick="toggleColorPicker()" title="Color" aria-label="Color">
+          <span id="colorDropIcon" class="color-drop-swatch"></span>
+        </button>
+        <div id="colorPickerPopup" class="color-picker-popup hidden"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -763,90 +773,294 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
-function formatNoteDate(timestamp) {
-  const date = new Date(timestamp);
-  return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) + ' · ' + date.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
-}
-
-let currentNoteId = null;
+const NOTE_COLORS = [
+  { name: 'Bright Red', value: '#FF3131' },
+  { name: 'Bright Pink', value: '#FF3DB0' },
+  { name: 'Bright Yellow', value: '#FFE600' },
+  { name: 'Bright Orange', value: '#FF8C00' },
+  { name: 'Bright Green', value: '#00C853' },
+  { name: 'Bright Blue', value: '#1E90FF' },
+  { name: 'Dark Blue', value: '#0B3D91' },
+  { name: 'Bright Purple', value: '#9B30FF' },
+  { name: 'Black', value: '#000000' },
+  { name: 'Brown', value: '#8B4513' }
+];
 
 function renderNotesList() {
   const notes = getNotes().slice().sort((a, b) => b.updatedAt - a.updatedAt);
-  const list = document.getElementById('notesList');
+  const container = document.getElementById('notesList');
   const emptyState = document.getElementById('notesEmptyState');
-  if (notes.length === 0) {
-    list.innerHTML = '';
+  if (!notes.length) {
+    container.innerHTML = '';
     emptyState.classList.remove('hidden');
     return;
   }
   emptyState.classList.add('hidden');
-  list.innerHTML = notes.map(note => `
-    <div class="note-card" onclick="openNoteEditor('${note.id}')">
-      <p class="note-card-title">${escapeHtml(note.title) || 'Untitled note'}</p>
-      <p class="note-card-snippet">${escapeHtml(note.content)}</p>
-      <p class="note-card-date">${formatNoteDate(note.updatedAt)}</p>
+  container.innerHTML = notes.map(note => `
+    <div class="todo-list-card">
+      <div class="todo-list-card-info" onclick="openNoteEditor('${note.id}')">
+        <p class="note-card-title">${escapeHtml(note.title) || 'Untitled note'}</p>
+        <p class="note-card-snippet">${escapeHtml(note.text || '')}${note.date ? ' · ' + escapeHtml(note.date) : ''}</p>
+      </div>
+      <button class="todo-list-delete-btn" onclick="event.stopPropagation(); deleteNoteFromCard('${note.id}')" aria-label="Delete note" title="Delete note">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+      </button>
     </div>
   `).join('');
 }
 
-function openNoteEditor(noteId) {
-  currentNoteId = noteId || null;
-  const deleteBtn = document.getElementById('deleteNoteBtn');
-  if (currentNoteId) {
-    const note = getNotes().find(n => n.id === currentNoteId);
-    document.getElementById('noteEditorTitle').textContent = 'Edit note';
-    document.getElementById('noteTitleInput').value = note ? note.title : '';
-    document.getElementById('noteContentInput').value = note ? note.content : '';
-    deleteBtn.classList.remove('hidden');
-  } else {
-    document.getElementById('noteEditorTitle').textContent = 'New note';
-    document.getElementById('noteTitleInput').value = '';
-    document.getElementById('noteContentInput').value = '';
-    deleteBtn.classList.add('hidden');
-  }
-  document.getElementById('noteEditorModal').classList.remove('hidden');
+function deleteNoteFromCard(id) {
+  if (!confirm('Delete this note?')) return;
+  const notes = getNotes().filter(n => n.id !== id);
+  saveNotesToStorage(notes);
+  renderNotesList();
+}
+
+function createNewNote() {
+  const notes = getNotes();
+  const newNote = {
+    id: 'note_' + Date.now(),
+    title: '',
+    date: '',
+    text: '',
+    color: '#000000',
+    tool: 'text',
+    strokes: [],
+    updatedAt: Date.now()
+  };
+  notes.push(newNote);
+  saveNotesToStorage(notes);
+  openNoteEditor(newNote.id);
+}
+
+let currentNoteId = null;
+let noteEditorReturnTo = 'notes';
+let currentNoteTool = 'text';
+let currentNoteColor = '#000000';
+let noteCanvasCtx = null;
+let isDrawingStroke = false;
+let activeStroke = null;
+
+function getCurrentNote() {
+  return getNotes().find(n => n.id === currentNoteId);
+}
+
+function openNoteEditor(id, returnTo) {
+  currentNoteId = id;
+  noteEditorReturnTo = returnTo || 'notes';
+  const note = getCurrentNote();
+  currentNoteTool = (note && note.tool) || 'text';
+  currentNoteColor = (note && note.color) || '#000000';
+
+  document.getElementById('noteTitleInput').value = note ? note.title : '';
+  document.getElementById('noteDateInput').value = note ? (note.date || '') : '';
+  const textarea = document.getElementById('noteTextArea');
+  textarea.value = note ? (note.text || '') : '';
+  textarea.style.color = currentNoteColor;
+
+  document.getElementById('homeScreen').classList.add('hidden');
+  document.getElementById('calendarScreen').classList.add('hidden');
+  document.getElementById('todolistScreen').classList.add('hidden');
+  document.getElementById('todoEditorScreen').classList.add('hidden');
+  document.getElementById('notesScreen').classList.add('hidden');
+  document.getElementById('dayViewScreen').classList.add('hidden');
+  document.getElementById('noteEditorScreen').classList.remove('hidden');
+
+  setupNoteCanvas();
+  applyNoteTool(currentNoteTool);
+  updateColorSwatch();
+  renderColorPickerOptions();
+  document.getElementById('colorPickerPopup').classList.add('hidden');
 }
 
 function closeNoteEditor() {
-  document.getElementById('noteEditorModal').classList.add('hidden');
+  document.getElementById('noteEditorScreen').classList.add('hidden');
   currentNoteId = null;
-}
-
-function saveCurrentNote() {
-  const title = document.getElementById('noteTitleInput').value.trim();
-  const content = document.getElementById('noteContentInput').value.trim();
-  if (!title && !content) {
-    closeNoteEditor();
-    return;
-  }
-  const notes = getNotes();
-  if (currentNoteId) {
-    const index = notes.findIndex(n => n.id === currentNoteId);
-    if (index !== -1) {
-      notes[index].title = title;
-      notes[index].content = content;
-      notes[index].updatedAt = Date.now();
-    }
+  if (noteEditorReturnTo === 'dayview') {
+    document.getElementById('dayViewScreen').classList.remove('hidden');
+    renderLinkedItems();
   } else {
-    notes.push({
-      id: 'note_' + Date.now(),
-      title: title,
-      content: content,
-      updatedAt: Date.now()
-    });
+    document.getElementById('notesScreen').classList.remove('hidden');
+    renderNotesList();
   }
-  saveNotesToStorage(notes);
-  renderNotesList();
-  closeNoteEditor();
 }
 
 function deleteCurrentNote() {
-  if (!currentNoteId) return;
   if (!confirm('Delete this note?')) return;
   const notes = getNotes().filter(n => n.id !== currentNoteId);
   saveNotesToStorage(notes);
-  renderNotesList();
   closeNoteEditor();
+}
+
+function updateNoteTitle(value) {
+  const notes = getNotes();
+  const note = notes.find(n => n.id === currentNoteId);
+  if (note) {
+    note.title = value;
+    note.updatedAt = Date.now();
+    saveNotesToStorage(notes);
+  }
+}
+
+function handleNoteDateInput(el) {
+  el.value = formatDateInput(el.value);
+}
+
+function updateNoteDate(value) {
+  const notes = getNotes();
+  const note = notes.find(n => n.id === currentNoteId);
+  if (note) {
+    note.date = value;
+    note.updatedAt = Date.now();
+    saveNotesToStorage(notes);
+  }
+}
+
+function updateNoteText(value) {
+  const notes = getNotes();
+  const note = notes.find(n => n.id === currentNoteId);
+  if (note) {
+    note.text = value;
+    note.updatedAt = Date.now();
+    saveNotesToStorage(notes);
+  }
+}
+
+function setupNoteCanvas() {
+  const canvas = document.getElementById('noteCanvas');
+  const wrapper = canvas.parentElement;
+  canvas.width = wrapper.clientWidth;
+  canvas.height = wrapper.clientHeight;
+  noteCanvasCtx = canvas.getContext('2d');
+  redrawNoteCanvas();
+
+  canvas.onpointerdown = handleStrokeStart;
+  canvas.onpointermove = handleStrokeMove;
+  canvas.onpointerup = handleStrokeEnd;
+  canvas.onpointerleave = handleStrokeEnd;
+}
+
+function drawStroke(ctx, stroke) {
+  if (!stroke.points || stroke.points.length < 2) return;
+  ctx.save();
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = stroke.color;
+  if (stroke.mode === 'highlighter') {
+    ctx.globalAlpha = 0.35;
+    ctx.lineWidth = 16;
+  } else {
+    ctx.globalAlpha = 1;
+    ctx.lineWidth = 3;
+  }
+  ctx.beginPath();
+  ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+  for (let i = 1; i < stroke.points.length; i++) {
+    ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
+function redrawNoteCanvas() {
+  const note = getCurrentNote();
+  if (!noteCanvasCtx || !note) return;
+  const canvas = noteCanvasCtx.canvas;
+  noteCanvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+  (note.strokes || []).forEach(stroke => drawStroke(noteCanvasCtx, stroke));
+}
+
+function getCanvasPoint(e) {
+  const rect = e.target.getBoundingClientRect();
+  return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+}
+
+function handleStrokeStart(e) {
+  if (currentNoteTool !== 'pen' && currentNoteTool !== 'highlighter') return;
+  isDrawingStroke = true;
+  activeStroke = { mode: currentNoteTool, color: currentNoteColor, points: [getCanvasPoint(e)] };
+  e.target.setPointerCapture(e.pointerId);
+}
+
+function handleStrokeMove(e) {
+  if (!isDrawingStroke || !activeStroke) return;
+  activeStroke.points.push(getCanvasPoint(e));
+  redrawNoteCanvas();
+  drawStroke(noteCanvasCtx, activeStroke);
+}
+
+function handleStrokeEnd() {
+  if (!isDrawingStroke || !activeStroke) return;
+  isDrawingStroke = false;
+  if (activeStroke.points.length > 1) {
+    const notes = getNotes();
+    const note = notes.find(n => n.id === currentNoteId);
+    if (note) {
+      note.strokes = note.strokes || [];
+      note.strokes.push(activeStroke);
+      note.updatedAt = Date.now();
+      saveNotesToStorage(notes);
+    }
+  }
+  activeStroke = null;
+}
+
+function setNoteTool(tool) {
+  currentNoteTool = tool;
+  const notes = getNotes();
+  const note = notes.find(n => n.id === currentNoteId);
+  if (note) {
+    note.tool = tool;
+    saveNotesToStorage(notes);
+  }
+  applyNoteTool(tool);
+}
+
+function applyNoteTool(tool) {
+  const canvas = document.getElementById('noteCanvas');
+  const textarea = document.getElementById('noteTextArea');
+  const isDrawMode = tool === 'pen' || tool === 'highlighter';
+  canvas.style.pointerEvents = isDrawMode ? 'auto' : 'none';
+  canvas.style.cursor = isDrawMode ? 'crosshair' : 'default';
+  textarea.readOnly = isDrawMode;
+  textarea.style.pointerEvents = isDrawMode ? 'none' : 'auto';
+
+  document.getElementById('toolPenBtn').classList.toggle('active', tool === 'pen');
+  document.getElementById('toolHighlighterBtn').classList.toggle('active', tool === 'highlighter');
+  document.getElementById('toolTextBtn').classList.toggle('active', tool === 'text');
+
+  if (tool === 'text') {
+    textarea.focus();
+  }
+}
+
+function renderColorPickerOptions() {
+  document.getElementById('colorPickerPopup').innerHTML = NOTE_COLORS.map(c => `
+    <div class="color-swatch ${c.value === currentNoteColor ? 'selected' : ''}" style="background:${c.value};" title="${c.name}" onclick="selectNoteColor('${c.value}')"></div>
+  `).join('');
+}
+
+function toggleColorPicker() {
+  document.getElementById('colorPickerPopup').classList.toggle('hidden');
+}
+
+function selectNoteColor(hex) {
+  currentNoteColor = hex;
+  const notes = getNotes();
+  const note = notes.find(n => n.id === currentNoteId);
+  if (note) {
+    note.color = hex;
+    note.updatedAt = Date.now();
+    saveNotesToStorage(notes);
+  }
+  document.getElementById('noteTextArea').style.color = hex;
+  updateColorSwatch();
+  renderColorPickerOptions();
+  document.getElementById('colorPickerPopup').classList.add('hidden');
+}
+
+function updateColorSwatch() {
+  document.getElementById('colorDropIcon').style.background = currentNoteColor;
 }
 
 function getTasks() {
@@ -1013,7 +1227,7 @@ function removeLinkedItem(type, id) {
 
 function openLinkedItem(type, id) {
   if (type === 'note') {
-    openNoteEditor(id);
+    openNoteEditor(id, 'dayview');
   } else if (type === 'todo') {
     openTodoEditor(id, 'dayview');
   }
@@ -1174,6 +1388,7 @@ function openTodoEditor(id, returnTo) {
   document.getElementById('calendarScreen').classList.add('hidden');
   document.getElementById('todolistScreen').classList.add('hidden');
   document.getElementById('notesScreen').classList.add('hidden');
+  document.getElementById('noteEditorScreen').classList.add('hidden');
   document.getElementById('dayViewScreen').classList.add('hidden');
   document.getElementById('todoEditorScreen').classList.remove('hidden');
 }
@@ -1183,6 +1398,7 @@ function closeTodoEditor() {
   currentTodoListId = null;
   if (todoEditorReturnTo === 'dayview') {
     document.getElementById('dayViewScreen').classList.remove('hidden');
+    renderLinkedItems();
   } else {
     document.getElementById('todolistScreen').classList.remove('hidden');
     renderTodoListsScreen();
