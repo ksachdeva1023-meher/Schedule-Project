@@ -70,6 +70,7 @@ button, input, textarea, select { font-family: inherit; }
 .hidden { display: none !important; }
 .header-bar { display: flex; align-items: center; gap: 12px; margin-top: 4rem; margin-bottom: 1.5rem; }
 .header-bar button { background: none; border: none; padding: 4px 8px; color: var(--text-secondary); cursor: pointer; font-size: 18px; }
+.header-bar button.back-arrow-lg { font-size: 32px; padding: 2px 10px; }
 .header-bar h2 { font-size: 18px; font-weight: 500; color: var(--text-primary); margin: 0; flex: 1; }
 .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.45); display: flex; align-items: center; justify-content: center; z-index: 200; min-height: 400px; }
 .modal-card { background: var(--surface-2); border-radius: 12px; border: 0.5px solid var(--border); padding: 1.5rem; max-width: 400px; width: 90%; max-height: 80vh; overflow-y: auto; }
@@ -520,7 +521,7 @@ body.theme-jungle {
 
   <div id="todolistScreen" class="hidden">
     <div class="header-bar">
-      <button onclick="switchView('home')" aria-label="Back to home">←</button>
+      <button class="back-arrow-lg" onclick="switchView('home')" aria-label="Back to home">←</button>
       <div style="flex: 1;"></div>
     </div>
     <button class="create-list-btn" onclick="createNewTodoList()">
@@ -532,7 +533,7 @@ body.theme-jungle {
 
   <div id="todoEditorScreen" class="hidden">
     <div class="header-bar">
-      <button onclick="closeTodoEditor()" aria-label="Back to to-do lists">←</button>
+      <button class="back-arrow-lg" onclick="closeTodoEditor()" aria-label="Back to to-do lists">←</button>
       <div style="flex: 1;"></div>
       <button onclick="deleteCurrentTodoList()" aria-label="Delete list" title="Delete list"><i class="ti ti-trash" aria-hidden="true"></i></button>
     </div>
