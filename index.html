@@ -321,6 +321,38 @@ body.theme-lavender {
   --fill-accent-hover: #9966cc;
   --on-accent: #ffffff;
 }
+
+body.theme-cherryred {
+  --surface-0: #fde2e2;
+  --surface-1: #faa0a0;
+  --surface-2: #ff6b6b;
+  --text-primary: #4d0000;
+  --text-secondary: #8b0000;
+  --text-muted: #a83a3a;
+  --border: #e8a0b4;
+  --border-strong: #c21e56;
+  --bg-accent: #fbc4c4;
+  --text-accent: #4d0000;
+  --fill-accent: #ff3131;
+  --fill-accent-hover: #d2042d;
+  --on-accent: #ffffff;
+}
+
+body.theme-sunshine {
+  --surface-0: #fff7c2;
+  --surface-1: #fdfd96;
+  --surface-2: #ffea00;
+  --text-primary: #4d3b00;
+  --text-secondary: #7a5c00;
+  --text-muted: #a68a26;
+  --border: #ffd24c;
+  --border-strong: #ffae42;
+  --bg-accent: #fff3b0;
+  --text-accent: #4d3b00;
+  --fill-accent: #ffae42;
+  --fill-accent-hover: #ccaa00;
+  --on-accent: #ffffff;
+}
 </style>
 </head>
 <body>
@@ -385,6 +417,14 @@ body.theme-lavender {
         <div class="option-radio" id="themeLa" onclick="selectTheme('lavender')">
           <div class="theme-preview" style="background: #8a2be2;"></div>
           <label>Lavender</label>
+        </div>
+        <div class="option-radio" id="themeCr" onclick="selectTheme('cherryred')">
+          <div class="theme-preview" style="background: #d2042d;"></div>
+          <label>Cherry</label>
+        </div>
+        <div class="option-radio" id="themeSu" onclick="selectTheme('sunshine')">
+          <div class="theme-preview" style="background: #ffae42;"></div>
+          <label>Sunshine</label>
         </div>
       </div>
     </div>
@@ -713,7 +753,7 @@ function saveSettings(settings) {
 }
 
 function applySettings(settings) {
-  document.body.classList.remove('theme-cherry', 'theme-arctic', 'theme-coffee', 'theme-jungle', 'theme-autumn', 'theme-lavender');
+  document.body.classList.remove('theme-cherry', 'theme-arctic', 'theme-coffee', 'theme-jungle', 'theme-autumn', 'theme-lavender', 'theme-cherryred', 'theme-sunshine');
   document.body.classList.add('theme-' + settings.theme);
 
   document.body.classList.remove('font-serif', 'font-mono', 'font-changa', 'font-indie', 'font-itim', 'font-amatic', 'font-comic');
@@ -776,6 +816,8 @@ function updateThemeRadios(theme) {
   document.getElementById('themeJu').classList.toggle('selected', theme === 'jungle');
   document.getElementById('themeAu').classList.toggle('selected', theme === 'autumn');
   document.getElementById('themeLa').classList.toggle('selected', theme === 'lavender');
+  document.getElementById('themeCr').classList.toggle('selected', theme === 'cherryred');
+  document.getElementById('themeSu').classList.toggle('selected', theme === 'sunshine');
 }
 
 function updateFontRadios(font) {
