@@ -183,7 +183,7 @@ button, input, textarea, select { font-family: inherit; }
 .note-textarea-full:focus { outline: none; }
 .note-textarea-full.is-empty:before { content: attr(data-placeholder); color: var(--text-secondary); pointer-events: none; }
 .note-canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; }
-.note-toolbar { display: flex; align-items: center; gap: 10px; max-width: 700px; margin: 0 auto; position: relative; }
+.note-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; max-width: 700px; margin: 0 auto; position: relative; }
 .note-tool-btn { background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 10px; padding: 10px 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-primary); font-size: 18px; font-weight: 700; min-width: 48px; }
 .note-tool-btn:hover { background: var(--surface-2); border-color: var(--border-stronger); }
 .note-tool-btn.active { border: 2px solid var(--fill-accent); background: var(--bg-accent); }
@@ -192,6 +192,10 @@ button, input, textarea, select { font-family: inherit; }
 .color-picker-popup { position: absolute; bottom: 58px; left: 0; background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 12px; padding: 12px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 10; }
 .color-swatch { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
 .color-swatch.selected { border-color: var(--text-primary); }
+.line-spacing-popup { position: absolute; bottom: 58px; left: 0; background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 12px; padding: 8px; display: flex; flex-direction: column; gap: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 10; min-width: 130px; }
+.line-spacing-option { padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; color: var(--text-primary); text-align: left; background: none; border: none; }
+.line-spacing-option:hover { background: var(--surface-1); }
+.line-spacing-option.selected { background: var(--bg-accent); color: var(--text-accent); font-weight: 500; }
 
 body.font-serif { --font-primary: 'Georgia', 'Times New Roman', serif; }
 body.font-mono { --font-primary: 'Courier New', 'Courier', monospace; }
@@ -550,12 +554,21 @@ body.theme-jungle {
     <div class="note-toolbar">
       <button class="note-tool-btn" id="toolPenBtn" onclick="setNoteTool('pen')" title="Pen" aria-label="Pen">🖊️</button>
       <button class="note-tool-btn" id="toolHighlighterBtn" onclick="setNoteTool('highlighter')" title="Highlighter" aria-label="Highlighter">🖍️</button>
+      <button class="note-tool-btn" id="toolEraserBtn" onclick="setNoteTool('eraser')" title="Eraser" aria-label="Eraser">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="9" width="14" height="8" rx="2" transform="rotate(-20 12 13)"></rect><line x1="6" y1="20" x2="18" y2="20"></line></svg>
+      </button>
       <button class="note-tool-btn" id="toolTextBtn" onclick="setNoteTool('text')" title="Text" aria-label="Text">A</button>
       <div class="note-color-wrapper">
         <button class="note-tool-btn" id="toolColorBtn" onclick="toggleColorPicker()" title="Color" aria-label="Color">
           <span id="colorDropIcon" class="color-drop-swatch"></span>
         </button>
         <div id="colorPickerPopup" class="color-picker-popup hidden"></div>
+      </div>
+      <div class="note-color-wrapper">
+        <button class="note-tool-btn" id="toolLineSpacingBtn" onclick="toggleLineSpacingPicker()" title="Line spacing" aria-label="Line spacing">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5l3 -3l3 3"></path><path d="M3 19l3 3l3 -3"></path><line x1="6" y1="2" x2="6" y2="22"></line><line x1="13" y1="6" x2="21" y2="6"></line><line x1="13" y1="12" x2="21" y2="12"></line><line x1="13" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+        <div id="lineSpacingPopup" class="line-spacing-popup hidden"></div>
       </div>
     </div>
   </div>
@@ -787,6 +800,13 @@ const NOTE_COLORS = [
   { name: 'Brown', value: '#8B4513' }
 ];
 
+const LINE_SPACING_OPTIONS = [
+  { label: 'Single', value: 1 },
+  { label: '1.15', value: 1.15 },
+  { label: '1.5', value: 1.5 },
+  { label: 'Double', value: 2 }
+];
+
 function renderNotesList() {
   const notes = getNotes().slice().sort((a, b) => b.updatedAt - a.updatedAt);
   const container = document.getElementById('notesList');
@@ -838,6 +858,7 @@ let currentNoteId = null;
 let noteEditorReturnTo = 'notes';
 let currentNoteTool = 'text';
 let currentNoteColor = '#000000';
+let currentNoteLineSpacing = 1;
 let noteCanvasCtx = null;
 let isDrawingStroke = false;
 let activeStroke = null;
@@ -861,6 +882,7 @@ function openNoteEditor(id, returnTo) {
   const note = getCurrentNote();
   currentNoteTool = (note && note.tool) || 'text';
   currentNoteColor = (note && note.color) || '#000000';
+  currentNoteLineSpacing = (note && note.lineSpacing) || 1;
   savedNoteRange = null;
 
   document.getElementById('noteTitleInput').value = note ? note.title : '';
@@ -868,6 +890,7 @@ function openNoteEditor(id, returnTo) {
   const textarea = document.getElementById('noteTextArea');
   textarea.innerHTML = note ? (note.text || '') : '';
   textarea.classList.toggle('is-empty', textarea.textContent.trim().length === 0);
+  textarea.style.lineHeight = currentNoteLineSpacing;
 
   document.getElementById('homeScreen').classList.add('hidden');
   document.getElementById('calendarScreen').classList.add('hidden');
@@ -881,7 +904,9 @@ function openNoteEditor(id, returnTo) {
   applyNoteTool(currentNoteTool);
   updateColorSwatch();
   renderColorPickerOptions();
+  renderLineSpacingOptions();
   document.getElementById('colorPickerPopup').classList.add('hidden');
+  document.getElementById('lineSpacingPopup').classList.add('hidden');
 }
 
 function closeNoteEditor() {
@@ -967,13 +992,19 @@ function drawStroke(ctx, stroke) {
   ctx.save();
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
-  ctx.strokeStyle = stroke.color;
-  if (stroke.mode === 'highlighter') {
-    ctx.globalAlpha = 0.35;
-    ctx.lineWidth = 26;
-  } else {
+  if (stroke.mode === 'eraser') {
+    ctx.globalCompositeOperation = 'destination-out';
     ctx.globalAlpha = 1;
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 30;
+  } else {
+    ctx.strokeStyle = stroke.color;
+    if (stroke.mode === 'highlighter') {
+      ctx.globalAlpha = 0.35;
+      ctx.lineWidth = 26;
+    } else {
+      ctx.globalAlpha = 1;
+      ctx.lineWidth = 3;
+    }
   }
   ctx.beginPath();
   ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
@@ -998,7 +1029,7 @@ function getCanvasPoint(e) {
 }
 
 function handleStrokeStart(e) {
-  if (currentNoteTool !== 'pen' && currentNoteTool !== 'highlighter') return;
+  if (currentNoteTool !== 'pen' && currentNoteTool !== 'highlighter' && currentNoteTool !== 'eraser') return;
   isDrawingStroke = true;
   activeStroke = { mode: currentNoteTool, color: currentNoteColor, points: [getCanvasPoint(e)] };
   e.target.setPointerCapture(e.pointerId);
@@ -1041,7 +1072,7 @@ function setNoteTool(tool) {
 function applyNoteTool(tool) {
   const canvas = document.getElementById('noteCanvas');
   const textarea = document.getElementById('noteTextArea');
-  const isDrawMode = tool === 'pen' || tool === 'highlighter';
+  const isDrawMode = tool === 'pen' || tool === 'highlighter' || tool === 'eraser';
   canvas.style.pointerEvents = isDrawMode ? 'auto' : 'none';
   canvas.style.cursor = isDrawMode ? 'crosshair' : 'default';
   textarea.contentEditable = isDrawMode ? 'false' : 'true';
@@ -1049,6 +1080,7 @@ function applyNoteTool(tool) {
 
   document.getElementById('toolPenBtn').classList.toggle('active', tool === 'pen');
   document.getElementById('toolHighlighterBtn').classList.toggle('active', tool === 'highlighter');
+  document.getElementById('toolEraserBtn').classList.toggle('active', tool === 'eraser');
   document.getElementById('toolTextBtn').classList.toggle('active', tool === 'text');
 
   if (tool === 'text') {
@@ -1083,7 +1115,33 @@ function renderColorPickerOptions() {
 }
 
 function toggleColorPicker() {
+  document.getElementById('lineSpacingPopup').classList.add('hidden');
   document.getElementById('colorPickerPopup').classList.toggle('hidden');
+}
+
+function renderLineSpacingOptions() {
+  document.getElementById('lineSpacingPopup').innerHTML = LINE_SPACING_OPTIONS.map(opt => `
+    <button class="line-spacing-option ${opt.value === currentNoteLineSpacing ? 'selected' : ''}" onclick="selectLineSpacing(${opt.value})">${opt.label}</button>
+  `).join('');
+}
+
+function toggleLineSpacingPicker() {
+  document.getElementById('colorPickerPopup').classList.add('hidden');
+  document.getElementById('lineSpacingPopup').classList.toggle('hidden');
+}
+
+function selectLineSpacing(value) {
+  currentNoteLineSpacing = value;
+  const notes = getNotes();
+  const note = notes.find(n => n.id === currentNoteId);
+  if (note) {
+    note.lineSpacing = value;
+    note.updatedAt = Date.now();
+    saveNotesToStorage(notes);
+  }
+  document.getElementById('noteTextArea').style.lineHeight = value;
+  renderLineSpacingOptions();
+  document.getElementById('lineSpacingPopup').classList.add('hidden');
 }
 
 function selectNoteColor(hex) {
