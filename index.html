@@ -508,8 +508,7 @@ body.theme-jungle {
   <div id="todolistScreen" class="hidden">
     <div class="header-bar">
       <button onclick="switchView('home')" aria-label="Back to home">←</button>
-      <h2>To-do lists</h2>
-      <div style="width: 32px;"></div>
+      <div style="flex: 1;"></div>
     </div>
     <button class="create-list-btn" onclick="createNewTodoList()">
       <i class="ti ti-plus" aria-hidden="true"></i> Create a new to-do list
@@ -521,7 +520,7 @@ body.theme-jungle {
   <div id="todoEditorScreen" class="hidden">
     <div class="header-bar">
       <button onclick="closeTodoEditor()" aria-label="Back to to-do lists">←</button>
-      <h2>To-do list</h2>
+      <div style="flex: 1;"></div>
       <button onclick="deleteCurrentTodoList()" aria-label="Delete list" title="Delete list"><i class="ti ti-trash" aria-hidden="true"></i></button>
     </div>
     <div class="todo-header-row">
