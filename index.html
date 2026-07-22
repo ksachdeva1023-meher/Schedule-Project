@@ -176,6 +176,10 @@ button, input, textarea, select { font-family: inherit; }
 .todo-add-row { display: flex; gap: 10px; max-width: 700px; margin: 0 auto; }
 .todo-add-btn { flex: 1; padding: 10px 14px; border-radius: var(--radius); border: 0.5px solid var(--border-strong); background: var(--surface-1); color: var(--text-primary); cursor: pointer; font-size: 13px; font-weight: 500; }
 .todo-add-btn:hover { background: var(--surface-2); border-color: var(--border-stronger); }
+.import-picker-card { max-width: 560px; }
+.import-picker-columns { display: flex; gap: 16px; }
+.import-picker-column { flex: 1; min-width: 0; }
+.import-picker-column-title { font-size: 13px; font-weight: 500; color: var(--text-secondary); margin: 0 0 8px; }
 
 body.font-serif { --font-primary: 'Georgia', 'Times New Roman', serif; }
 body.font-mono { --font-primary: 'Courier New', 'Courier', monospace; }
@@ -398,13 +402,22 @@ body.theme-jungle {
 </div>
 
 <div id="importPickerModal" class="modal-overlay hidden">
-  <div class="modal-card">
+  <div class="modal-card import-picker-card">
     <div class="modal-header-top">
       <button class="modal-close-btn" onclick="closeImportPicker()" aria-label="Back">←</button>
       <h3 class="modal-header">Import a checklist or note</h3>
       <div style="width: 32px;"></div>
     </div>
-    <div id="importPickerList" class="profile-list"></div>
+    <div class="import-picker-columns">
+      <div class="import-picker-column">
+        <p class="import-picker-column-title">Checklists</p>
+        <div id="importPickerTodoList" class="profile-list"></div>
+      </div>
+      <div class="import-picker-column">
+        <p class="import-picker-column-title">Notes</p>
+        <div id="importPickerNoteList" class="profile-list"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -979,21 +992,27 @@ function saveDayTitle(value) {
 function openImportPicker() {
   const notes = getNotes();
   const todoLists = getTodoLists();
-  const noteItems = notes.map(n => `
-    <div class="profile-item" style="cursor: pointer;" onclick="importItem('note', '${n.id}')">
-      <div class="profile-item-details">
-        <div class="profile-item-name">${escapeHtml(n.title) || 'Untitled note'}</div>
-      </div>
-    </div>
-  `).join('');
-  const todoItems = todoLists.map(t => `
-    <div class="profile-item" style="cursor: pointer;" onclick="importItem('todo', '${t.id}')">
-      <div class="profile-item-details">
-        <div class="profile-item-name">${escapeHtml(t.title) || 'Untitled list'}</div>
-      </div>
-    </div>
-  `).join('');
-  document.getElementById('importPickerList').innerHTML = (noteItems + todoItems) || '<p class="day-empty-tasks">You don\'t have any notes or to-do lists yet.</p>';
+
+  document.getElementById('importPickerTodoList').innerHTML = todoLists.length
+    ? todoLists.map(t => `
+        <div class="profile-item" style="cursor: pointer;" onclick="importItem('todo', '${t.id}')">
+          <div class="profile-item-details">
+            <div class="profile-item-name">${escapeHtml(t.title) || 'Untitled list'}</div>
+          </div>
+        </div>
+      `).join('')
+    : '<p class="day-empty-tasks">No checklists yet.</p>';
+
+  document.getElementById('importPickerNoteList').innerHTML = notes.length
+    ? notes.map(n => `
+        <div class="profile-item" style="cursor: pointer;" onclick="importItem('note', '${n.id}')">
+          <div class="profile-item-details">
+            <div class="profile-item-name">${escapeHtml(n.title) || 'Untitled note'}</div>
+          </div>
+        </div>
+      `).join('')
+    : '<p class="day-empty-tasks">No notes yet.</p>';
+
   document.getElementById('importPickerModal').classList.remove('hidden');
 }
 
