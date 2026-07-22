@@ -596,9 +596,12 @@ body.theme-autumn {
     <div class="note-toolbar">
       <button class="note-tool-btn" id="toolPenBtn" onclick="setNoteTool('pen')" title="Pen" aria-label="Pen">🖊️</button>
       <button class="note-tool-btn" id="toolHighlighterBtn" onclick="setNoteTool('highlighter')" title="Highlighter" aria-label="Highlighter">🖍️</button>
-      <button class="note-tool-btn" id="toolEraserBtn" onclick="setNoteTool('eraser')" title="Eraser" aria-label="Eraser">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="9" width="14" height="8" rx="2" transform="rotate(-20 12 13)"></rect><line x1="6" y1="20" x2="18" y2="20"></line></svg>
-      </button>
+      <div class="note-color-wrapper">
+        <button class="note-tool-btn" id="toolEraserBtn" onclick="selectEraserTool()" title="Eraser" aria-label="Eraser">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="9" width="14" height="8" rx="2" transform="rotate(-20 12 13)"></rect><line x1="6" y1="20" x2="18" y2="20"></line></svg>
+        </button>
+        <div id="eraserSizePopup" class="line-spacing-popup hidden"></div>
+      </div>
       <button class="note-tool-btn" id="toolTextBtn" onclick="setNoteTool('text')" title="Text" aria-label="Text">A</button>
       <button class="note-tool-btn" onclick="insertBulletList()" title="Bullet list" aria-label="Bullet list">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="9" y1="6" x2="20" y2="6"></line><line x1="9" y1="12" x2="20" y2="12"></line><line x1="9" y1="18" x2="20" y2="18"></line><circle cx="4" cy="6" r="1.5" fill="currentColor" stroke="none"></circle><circle cx="4" cy="12" r="1.5" fill="currentColor" stroke="none"></circle><circle cx="4" cy="18" r="1.5" fill="currentColor" stroke="none"></circle></svg>
@@ -877,6 +880,12 @@ const LINE_SPACING_OPTIONS = [
   { label: 'Double', value: 2 }
 ];
 
+const ERASER_SIZES = [
+  { label: 'Small', value: 15 },
+  { label: 'Medium', value: 30 },
+  { label: 'Large', value: 50 }
+];
+
 function renderNotesList() {
   const notes = getNotes().slice().sort((a, b) => b.updatedAt - a.updatedAt);
   const container = document.getElementById('notesList');
@@ -929,6 +938,7 @@ let noteEditorReturnTo = 'notes';
 let currentNoteTool = 'text';
 let currentNoteColor = '#000000';
 let currentNoteLineSpacing = 1;
+let currentEraserSize = 30;
 let noteCanvasCtx = null;
 let isDrawingStroke = false;
 let activeStroke = null;
@@ -953,6 +963,7 @@ function openNoteEditor(id, returnTo) {
   currentNoteTool = (note && note.tool) || 'text';
   currentNoteColor = (note && note.color) || '#000000';
   currentNoteLineSpacing = (note && note.lineSpacing) || 1;
+  currentEraserSize = (note && note.eraserSize) || 30;
   savedNoteRange = null;
 
   document.getElementById('noteTitleInput').value = note ? note.title : '';
@@ -975,8 +986,10 @@ function openNoteEditor(id, returnTo) {
   updateColorSwatch();
   renderColorPickerOptions();
   renderLineSpacingOptions();
+  renderEraserSizeOptions();
   document.getElementById('colorPickerPopup').classList.add('hidden');
   document.getElementById('lineSpacingPopup').classList.add('hidden');
+  document.getElementById('eraserSizePopup').classList.add('hidden');
 }
 
 function closeNoteEditor() {
@@ -1065,7 +1078,7 @@ function drawStroke(ctx, stroke) {
   if (stroke.mode === 'eraser') {
     ctx.globalCompositeOperation = 'destination-out';
     ctx.globalAlpha = 1;
-    ctx.lineWidth = 30;
+    ctx.lineWidth = stroke.eraserSize || 30;
   } else {
     ctx.strokeStyle = stroke.color;
     if (stroke.mode === 'highlighter') {
@@ -1101,7 +1114,7 @@ function getCanvasPoint(e) {
 function handleStrokeStart(e) {
   if (currentNoteTool !== 'pen' && currentNoteTool !== 'highlighter' && currentNoteTool !== 'eraser') return;
   isDrawingStroke = true;
-  activeStroke = { mode: currentNoteTool, color: currentNoteColor, points: [getCanvasPoint(e)] };
+  activeStroke = { mode: currentNoteTool, color: currentNoteColor, eraserSize: currentEraserSize, points: [getCanvasPoint(e)] };
   e.target.setPointerCapture(e.pointerId);
 }
 
@@ -1137,6 +1150,33 @@ function setNoteTool(tool) {
     saveNotesToStorage(notes);
   }
   applyNoteTool(tool);
+  document.getElementById('eraserSizePopup').classList.add('hidden');
+}
+
+function selectEraserTool() {
+  setNoteTool('eraser');
+  document.getElementById('colorPickerPopup').classList.add('hidden');
+  document.getElementById('lineSpacingPopup').classList.add('hidden');
+  document.getElementById('eraserSizePopup').classList.toggle('hidden');
+}
+
+function renderEraserSizeOptions() {
+  document.getElementById('eraserSizePopup').innerHTML = ERASER_SIZES.map(opt => `
+    <button class="line-spacing-option ${opt.value === currentEraserSize ? 'selected' : ''}" onclick="selectEraserSize(${opt.value})">${opt.label}</button>
+  `).join('');
+}
+
+function selectEraserSize(value) {
+  currentEraserSize = value;
+  const notes = getNotes();
+  const note = notes.find(n => n.id === currentNoteId);
+  if (note) {
+    note.eraserSize = value;
+    note.updatedAt = Date.now();
+    saveNotesToStorage(notes);
+  }
+  renderEraserSizeOptions();
+  document.getElementById('eraserSizePopup').classList.add('hidden');
 }
 
 function applyNoteTool(tool) {
@@ -1217,6 +1257,7 @@ function renderColorPickerOptions() {
 
 function toggleColorPicker() {
   document.getElementById('lineSpacingPopup').classList.add('hidden');
+  document.getElementById('eraserSizePopup').classList.add('hidden');
   document.getElementById('colorPickerPopup').classList.toggle('hidden');
 }
 
@@ -1228,6 +1269,7 @@ function renderLineSpacingOptions() {
 
 function toggleLineSpacingPicker() {
   document.getElementById('colorPickerPopup').classList.add('hidden');
+  document.getElementById('eraserSizePopup').classList.add('hidden');
   document.getElementById('lineSpacingPopup').classList.toggle('hidden');
 }
 
