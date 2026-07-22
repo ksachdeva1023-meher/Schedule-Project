@@ -273,6 +273,22 @@ body.theme-jungle {
   --fill-accent-hover: #3ea88e;
   --on-accent: #ffffff;
 }
+
+body.theme-autumn {
+  --surface-0: #ffdab3;
+  --surface-1: #ffc48a;
+  --surface-2: #ff7518;
+  --text-primary: #5a2600;
+  --text-secondary: #7a3300;
+  --text-muted: #a65826;
+  --border: #ffaa66;
+  --border-strong: #ff7518;
+  --bg-accent: #ffe0c2;
+  --text-accent: #5a2600;
+  --fill-accent: #ff8243;
+  --fill-accent-hover: #e86a2e;
+  --on-accent: #ffffff;
+}
 </style>
 </head>
 <body>
@@ -324,6 +340,10 @@ body.theme-jungle {
         <div class="option-radio" id="themeJu" onclick="selectTheme('jungle')">
           <div class="theme-preview" style="background: #2d8659;"></div>
           <label>Jungle</label>
+        </div>
+        <div class="option-radio" id="themeAu" onclick="selectTheme('autumn')">
+          <div class="theme-preview" style="background: #ff7518;"></div>
+          <label>Autumn</label>
         </div>
       </div>
     </div>
@@ -606,7 +626,7 @@ function saveSettings(settings) {
 }
 
 function applySettings(settings) {
-  document.body.classList.remove('theme-cherry', 'theme-arctic', 'theme-coffee', 'theme-jungle');
+  document.body.classList.remove('theme-cherry', 'theme-arctic', 'theme-coffee', 'theme-jungle', 'theme-autumn');
   document.body.classList.add('theme-' + settings.theme);
 
   document.body.classList.remove('font-serif', 'font-mono', 'font-changa', 'font-indie', 'font-itim', 'font-amatic', 'font-comic');
@@ -666,6 +686,7 @@ function updateThemeRadios(theme) {
   document.getElementById('themeAr').classList.toggle('selected', theme === 'arctic');
   document.getElementById('themeCo').classList.toggle('selected', theme === 'coffee');
   document.getElementById('themeJu').classList.toggle('selected', theme === 'jungle');
+  document.getElementById('themeAu').classList.toggle('selected', theme === 'autumn');
 }
 
 function updateFontRadios(font) {
