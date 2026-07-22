@@ -85,7 +85,6 @@ button, input, textarea, select { font-family: inherit; }
 .option-radio { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 8px; cursor: pointer; transition: all 0.2s; }
 .option-radio:hover { border-color: var(--border-stronger); background: var(--surface-0); }
 .option-radio.selected { border: 2px solid var(--fill-accent); background: var(--bg-accent); }
-.option-radio input { cursor: pointer; }
 .option-radio label { cursor: pointer; flex: 1; margin: 0; font-size: 14px; color: var(--text-primary); }
 .theme-preview { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--text-primary); flex-shrink: 0; }
 .modal-actions { display: flex; gap: 10px; margin-top: 1.5rem; }
@@ -181,6 +180,11 @@ button, input, textarea, select { font-family: inherit; }
 .import-picker-columns { display: flex; gap: 16px; }
 .import-picker-column { flex: 1; min-width: 0; }
 .import-picker-column-title { font-size: 13px; font-weight: 500; color: var(--text-secondary); margin: 0 0 8px; }
+.todo-list-card { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 10px; padding: 14px 16px; transition: all 0.2s; }
+.todo-list-card:hover { border-color: var(--border-stronger); background: var(--surface-2); }
+.todo-list-card-info { flex: 1; min-width: 0; cursor: pointer; }
+.todo-list-delete-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 18px; padding: 6px; flex-shrink: 0; }
+.todo-list-delete-btn:hover { color: var(--text-primary); }
 
 body.font-serif { --font-primary: 'Georgia', 'Times New Roman', serif; }
 body.font-mono { --font-primary: 'Courier New', 'Courier', monospace; }
@@ -290,24 +294,20 @@ body.theme-jungle {
       <label>Color Theme</label>
       <div class="options-group">
         <div class="option-radio" id="themeCh" onclick="selectTheme('cherry')">
-          <input type="radio" name="theme" value="cherry" id="themeChInput">
           <div class="theme-preview" style="background: #ff6b9d;"></div>
-          <label for="themeChInput">Cherry Blossom</label>
+          <label>Cherry Blossom</label>
         </div>
         <div class="option-radio" id="themeAr" onclick="selectTheme('arctic')">
-          <input type="radio" name="theme" value="arctic" id="themeArInput">
           <div class="theme-preview" style="background: #0091ff;"></div>
-          <label for="themeArInput">Arctic</label>
+          <label>Arctic</label>
         </div>
         <div class="option-radio" id="themeCo" onclick="selectTheme('coffee')">
-          <input type="radio" name="theme" value="coffee" id="themeCoInput">
           <div class="theme-preview" style="background: #6f4e37;"></div>
-          <label for="themeCo">Coffee</label>
+          <label>Coffee</label>
         </div>
         <div class="option-radio" id="themeJu" onclick="selectTheme('jungle')">
-          <input type="radio" name="theme" value="jungle" id="themeJuInput">
           <div class="theme-preview" style="background: #2d8659;"></div>
-          <label for="themeJuInput">Jungle</label>
+          <label>Jungle</label>
         </div>
       </div>
     </div>
@@ -316,36 +316,28 @@ body.theme-jungle {
       <label>Font</label>
       <div class="options-group">
         <div class="option-radio" id="fontSans" onclick="selectFont('sans')">
-          <input type="radio" name="font" value="sans" id="fontSansInput">
-          <label for="fontSansInput">Sans Serif (Default)</label>
+          <label>Sans Serif (Default)</label>
         </div>
         <div class="option-radio" id="fontSerif" onclick="selectFont('serif')">
-          <input type="radio" name="font" value="serif" id="fontSerifInput">
-          <label for="fontSerifInput">Serif</label>
+          <label>Serif</label>
         </div>
         <div class="option-radio" id="fontMono" onclick="selectFont('mono')">
-          <input type="radio" name="font" value="mono" id="fontMonoInput">
-          <label for="fontMonoInput">Monospace</label>
+          <label>Monospace</label>
         </div>
         <div class="option-radio" id="fontChanga" onclick="selectFont('changa')">
-          <input type="radio" name="font" value="changa" id="fontChangaInput">
-          <label for="fontChangaInput">Changa One</label>
+          <label>Changa One</label>
         </div>
         <div class="option-radio" id="fontIndie" onclick="selectFont('indie')">
-          <input type="radio" name="font" value="indie" id="fontIndieInput">
-          <label for="fontIndieInput">Indie Flower</label>
+          <label>Indie Flower</label>
         </div>
         <div class="option-radio" id="fontItim" onclick="selectFont('itim')">
-          <input type="radio" name="font" value="itim" id="fontItimInput">
-          <label for="fontItimInput">Itim</label>
+          <label>Itim</label>
         </div>
         <div class="option-radio" id="fontAmatic" onclick="selectFont('amatic')">
-          <input type="radio" name="font" value="amatic" id="fontAmaticInput">
-          <label for="fontAmaticInput">Amatic SC</label>
+          <label>Amatic SC</label>
         </div>
         <div class="option-radio" id="fontComic" onclick="selectFont('comic')">
-          <input type="radio" name="font" value="comic" id="fontComicInput">
-          <label for="fontComicInput">Comic Neue</label>
+          <label>Comic Neue</label>
         </div>
       </div>
     </div>
@@ -584,24 +576,8 @@ function applySettings(settings) {
 
 function openSettings() {
   const settings = getSettings();
-  document.getElementById('themeChInput').checked = settings.theme === 'cherry';
-  document.getElementById('themeArInput').checked = settings.theme === 'arctic';
-  document.getElementById('themeCoInput').checked = settings.theme === 'coffee';
-  document.getElementById('themeJuInput').checked = settings.theme === 'jungle';
-
   updateThemeRadios(settings.theme);
-
-  document.getElementById('fontSansInput').checked = settings.font === 'sans';
-  document.getElementById('fontSerifInput').checked = settings.font === 'serif';
-  document.getElementById('fontMonoInput').checked = settings.font === 'mono';
-  document.getElementById('fontChangaInput').checked = settings.font === 'changa';
-  document.getElementById('fontIndieInput').checked = settings.font === 'indie';
-  document.getElementById('fontItimInput').checked = settings.font === 'itim';
-  document.getElementById('fontAmaticInput').checked = settings.font === 'amatic';
-  document.getElementById('fontComicInput').checked = settings.font === 'comic';
-
   updateFontRadios(settings.font);
-
   document.getElementById('settingsModal').classList.remove('hidden');
 }
 
@@ -1157,12 +1133,24 @@ function renderTodoListsScreen() {
     const total = list.items.length;
     const done = list.items.filter(i => i.completed).length;
     return `
-      <div class="note-card" onclick="openTodoEditor('${list.id}')">
-        <p class="note-card-title">${escapeHtml(list.title) || 'Untitled list'}</p>
-        <p class="note-card-snippet">${done} of ${total} done${list.date ? ' · ' + escapeHtml(list.date) : ''}</p>
+      <div class="todo-list-card">
+        <div class="todo-list-card-info" onclick="openTodoEditor('${list.id}')">
+          <p class="note-card-title">${escapeHtml(list.title) || 'Untitled list'}</p>
+          <p class="note-card-snippet">${done} of ${total} done${list.date ? ' · ' + escapeHtml(list.date) : ''}</p>
+        </div>
+        <button class="todo-list-delete-btn" onclick="event.stopPropagation(); deleteTodoListFromCard('${list.id}')" aria-label="Delete list" title="Delete list">
+          <i class="ti ti-trash" aria-hidden="true"></i>
+        </button>
       </div>
     `;
   }).join('');
+}
+
+function deleteTodoListFromCard(id) {
+  if (!confirm('Delete this to-do list?')) return;
+  const lists = getTodoLists().filter(l => l.id !== id);
+  saveTodoListsToStorage(lists);
+  renderTodoListsScreen();
 }
 
 function createNewTodoList() {
