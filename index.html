@@ -299,6 +299,22 @@ body.theme-autumn {
   --fill-accent-hover: #e86a2e;
   --on-accent: #ffffff;
 }
+
+body.theme-lavender {
+  --surface-0: #ede4f7;
+  --surface-1: #dcc9f0;
+  --surface-2: #c9aee8;
+  --text-primary: #2e0b4d;
+  --text-secondary: #4b0082;
+  --text-muted: #6a3a9a;
+  --border: #b18cd9;
+  --border-strong: #967bb6;
+  --bg-accent: #d8bfee;
+  --text-accent: #2e0b4d;
+  --fill-accent: #8a2be2;
+  --fill-accent-hover: #9966cc;
+  --on-accent: #ffffff;
+}
 </style>
 </head>
 <body>
@@ -354,6 +370,10 @@ body.theme-autumn {
         <div class="option-radio" id="themeAu" onclick="selectTheme('autumn')">
           <div class="theme-preview" style="background: #ff7518;"></div>
           <label>Autumn</label>
+        </div>
+        <div class="option-radio" id="themeLa" onclick="selectTheme('lavender')">
+          <div class="theme-preview" style="background: #8a2be2;"></div>
+          <label>Lavender</label>
         </div>
       </div>
     </div>
@@ -661,7 +681,7 @@ function saveSettings(settings) {
 }
 
 function applySettings(settings) {
-  document.body.classList.remove('theme-cherry', 'theme-arctic', 'theme-coffee', 'theme-jungle', 'theme-autumn');
+  document.body.classList.remove('theme-cherry', 'theme-arctic', 'theme-coffee', 'theme-jungle', 'theme-autumn', 'theme-lavender');
   document.body.classList.add('theme-' + settings.theme);
 
   document.body.classList.remove('font-serif', 'font-mono', 'font-changa', 'font-indie', 'font-itim', 'font-amatic', 'font-comic');
@@ -722,6 +742,7 @@ function updateThemeRadios(theme) {
   document.getElementById('themeCo').classList.toggle('selected', theme === 'coffee');
   document.getElementById('themeJu').classList.toggle('selected', theme === 'jungle');
   document.getElementById('themeAu').classList.toggle('selected', theme === 'autumn');
+  document.getElementById('themeLa').classList.toggle('selected', theme === 'lavender');
 }
 
 function updateFontRadios(font) {
