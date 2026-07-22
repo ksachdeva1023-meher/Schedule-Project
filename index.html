@@ -35,7 +35,8 @@ button, input, textarea, select { font-family: inherit; }
 .profile-card { background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 14px; padding: 18px 24px; display: flex; align-items: center; gap: 16px; cursor: pointer; transition: all 0.2s; min-width: 260px; }
 .profile-card:hover { border-color: var(--border-stronger); background: var(--surface-2); }
 .profile-card:active { transform: scale(0.98); }
-.profile-avatar-small { width: 52px; height: 52px; border-radius: 50%; background: var(--bg-accent); display: flex; align-items: center; justify-content: center; font-weight: 500; font-size: 18px; color: var(--on-accent); flex-shrink: 0; }
+.profile-avatar-small { width: 52px; height: 52px; border-radius: 50%; background: var(--bg-accent); display: flex; align-items: center; justify-content: center; font-weight: 500; font-size: 18px; color: var(--on-accent); flex-shrink: 0; overflow: hidden; }
+.profile-avatar-small svg { width: 100%; height: 100%; }
 .profile-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .profile-name { font-size: 19px; font-weight: 500; color: var(--text-primary); margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .profile-label { font-size: 14px; color: var(--text-secondary); margin: 0; }
@@ -95,7 +96,14 @@ button, input, textarea, select { font-family: inherit; }
 .profile-item { background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 8px; padding: 12px; display: flex; align-items: center; gap: 12px; }
 .profile-item.active { border: 2px solid var(--fill-accent); background: var(--bg-accent); }
 .profile-item.active .profile-item-name { color: var(--text-accent); }
-.profile-item-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--bg-accent); display: flex; align-items: center; justify-content: center; font-weight: 500; font-size: 12px; color: var(--on-accent); flex-shrink: 0; }
+.profile-item-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--bg-accent); display: flex; align-items: center; justify-content: center; font-weight: 500; font-size: 12px; color: var(--on-accent); flex-shrink: 0; overflow: hidden; }
+.profile-picture-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+.profile-picture-option { width: 100%; aspect-ratio: 1; border: 2px solid var(--border-strong); border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; background: var(--surface-1); padding: 8px; }
+.profile-picture-option:hover { border-color: var(--border-stronger); background: var(--surface-0); }
+.profile-picture-option.selected { border: 2px solid var(--fill-accent); background: var(--bg-accent); }
+.profile-picture-option svg { width: 100%; height: 100%; }
+.profile-avatar-preview { width: 64px; height: 64px; border-radius: 50%; background: var(--surface-1); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; overflow: hidden; flex-shrink: 0; }
+.profile-avatar-preview svg { width: 100%; height: 100%; }
 .profile-item-name { font-size: 14px; font-weight: 500; color: var(--text-primary); }
 .profile-item-email { font-size: 12px; color: var(--text-secondary); }
 .profile-item-details { flex: 1; min-width: 0; }
@@ -417,6 +425,11 @@ body.theme-autumn {
 
     <div id="editProfileContent" class="hidden">
       <div class="form-group">
+        <label>Profile Picture</label>
+        <div class="profile-avatar-preview" id="profileAvatarPreview"></div>
+        <div class="profile-picture-grid" id="profilePictureGrid"></div>
+      </div>
+      <div class="form-group">
         <label>Name</label>
         <input type="text" id="profileName" placeholder="Your name">
       </div>
@@ -626,6 +639,17 @@ body.theme-autumn {
 </div>
 
 <script>
+const PROFILE_PICTURES = [
+  { id: 'star', name: 'Star', color: '#FFB6D9', svg: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><polygon points="50,10 61,40 92,40 67,60 78,90 50,70 22,90 33,60 8,40 39,40" fill="#FFB6D9"/></svg>' },
+  { id: 'heart', name: 'Heart', color: '#FFB6D9', svg: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50,85 C20,70 10,55 10,40 C10,25 25,15 35,15 C42,15 50,20 50,20 C50,20 58,15 65,15 C75,15 90,25 90,40 C90,55 80,70 50,85 Z" fill="#FFB6D9"/></svg>' },
+  { id: 'cloud', name: 'Cloud', color: '#B3E5FC', svg: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M20,50 Q15,50 15,55 Q15,65 25,70 L75,70 Q85,70 85,60 Q85,50 75,50 Q72,40 60,40 Q50,35 40,40 Q30,40 20,50 Z" fill="#B3E5FC"/></svg>' },
+  { id: 'apple', name: 'Apple', color: '#C8E6C9', svg: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="55" r="35" fill="#C8E6C9"/><ellipse cx="50" cy="25" rx="8" ry="12" fill="#81C784"/><circle cx="58" cy="20" r="4" fill="#558B2F"/></svg>' },
+  { id: 'butterfly', name: 'Butterfly', color: '#E1BEE7', svg: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="35" rx="12" ry="18" fill="#E1BEE7"/><ellipse cx="70" cy="35" rx="12" ry="18" fill="#E1BEE7"/><ellipse cx="25" cy="60" rx="10" ry="15" fill="#E1BEE7"/><ellipse cx="75" cy="60" rx="10" ry="15" fill="#E1BEE7"/><rect x="48" y="30" width="4" height="50" fill="#A78BFA"/></svg>' },
+  { id: 'bunny', name: 'Bunny', color: '#FFE0B2', svg: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="60" r="25" fill="#FFE0B2"/><ellipse cx="35" cy="25" rx="8" ry="20" fill="#FFE0B2"/><ellipse cx="65" cy="25" rx="8" ry="20" fill="#FFE0B2"/><circle cx="38" cy="28" r="3" fill="#FFB3BA"/><circle cx="62" cy="28" r="3" fill="#FFB3BA"/><circle cx="50" cy="60" r="4" fill="#FFB3BA"/></svg>' }
+];
+
+let selectedProfilePicture = 'star';
+
 function getSettings() {
   const saved = localStorage.getItem('appSettings');
   return saved ? JSON.parse(saved) : { theme: 'cherry', font: 'sans', size: 1 };
@@ -714,7 +738,7 @@ function updateFontRadios(font) {
 function getAllProfiles() {
   const saved = localStorage.getItem('allProfiles');
   if (!saved) {
-    const defaultProfiles = [{ id: 'default', name: 'User', email: '' }];
+    const defaultProfiles = [{ id: 'default', name: 'User', email: '', picture: 'star' }];
     localStorage.setItem('allProfiles', JSON.stringify(defaultProfiles));
     localStorage.setItem('currentProfileId', 'default');
     return defaultProfiles;
@@ -753,8 +777,15 @@ function setCurrentProfile(profileId) {
 
 function updateProfileDisplay() {
   const profile = getCurrentProfile();
-  const initials = profile.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'U';
-  document.getElementById('profileInitials').textContent = initials;
+  const avatarContainer = document.getElementById('profileInitials').parentElement;
+  const picture = PROFILE_PICTURES.find(p => p.id === (profile.picture || 'star'));
+  if (picture) {
+    document.getElementById('profileInitials').innerHTML = picture.svg;
+    document.getElementById('profileInitials').style.display = 'block';
+  } else {
+    const initials = profile.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'U';
+    document.getElementById('profileInitials').textContent = initials;
+  }
   document.getElementById('profileDisplayName').textContent = profile.name;
 }
 
@@ -764,7 +795,7 @@ function renderProfilesList() {
   const list = document.getElementById('profilesList');
   list.innerHTML = profiles.map(profile => `
     <div class="profile-item ${profile.id === currentId ? 'active' : ''}">
-      <div class="profile-item-avatar">${profile.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}</div>
+      <div class="profile-item-avatar">${getProfilePictureHTML(profile.picture || 'star')}</div>
       <div class="profile-item-details">
         <div class="profile-item-name">${profile.name}</div>
         ${profile.email ? `<div class="profile-item-email">${profile.email}</div>` : ''}
@@ -775,6 +806,40 @@ function renderProfilesList() {
       </div>
     </div>
   `).join('');
+}
+
+function getProfilePictureHTML(pictureId) {
+  const picture = PROFILE_PICTURES.find(p => p.id === pictureId);
+  if (picture) {
+    return picture.svg;
+  }
+  const initials = getCurrentProfile().name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'U';
+  return initials;
+}
+
+function renderProfilePictureGrid() {
+  const grid = document.getElementById('profilePictureGrid');
+  grid.innerHTML = PROFILE_PICTURES.map(picture => `
+    <div class="profile-picture-option ${selectedProfilePicture === picture.id ? 'selected' : ''}"
+         onclick="selectProfilePicture('${picture.id}')"
+         title="${picture.name}">
+      ${picture.svg}
+    </div>
+  `).join('');
+}
+
+function selectProfilePicture(pictureId) {
+  selectedProfilePicture = pictureId;
+  renderProfilePictureGrid();
+  updateProfileAvatarPreview();
+}
+
+function updateProfileAvatarPreview() {
+  const preview = document.getElementById('profileAvatarPreview');
+  const picture = PROFILE_PICTURES.find(p => p.id === selectedProfilePicture);
+  if (picture) {
+    preview.innerHTML = picture.svg;
+  }
 }
 
 function openProfileMenu() {
@@ -801,9 +866,12 @@ function editProfileModal(profileId) {
   const profiles = getAllProfiles();
   const profile = profiles.find(p => p.id === profileId);
   if (profile) {
+    selectedProfilePicture = profile.picture || 'star';
     document.getElementById('profileName').value = profile.name;
     document.getElementById('profileEmail').value = profile.email;
     document.getElementById('profileName').dataset.profileId = profileId;
+    renderProfilePictureGrid();
+    updateProfileAvatarPreview();
     document.getElementById('profileMenuContent').classList.add('hidden');
     document.getElementById('editProfileContent').classList.remove('hidden');
     document.getElementById('newProfileContent').classList.add('hidden');
@@ -822,7 +890,8 @@ function saveProfile() {
   const profile = {
     id: profileId,
     name: document.getElementById('profileName').value || 'User',
-    email: document.getElementById('profileEmail').value
+    email: document.getElementById('profileEmail').value,
+    picture: selectedProfilePicture
   };
   saveProfileToStorage(profile);
   backToProfileMenu();
@@ -838,7 +907,8 @@ function createNewProfile() {
   const profile = {
     id: id,
     name: name,
-    email: document.getElementById('newProfileEmail').value
+    email: document.getElementById('newProfileEmail').value,
+    picture: 'star'
   };
   saveProfileToStorage(profile);
   setCurrentProfile(id);
