@@ -179,8 +179,9 @@ button, input, textarea, select { font-family: inherit; }
 .todo-list-delete-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 18px; padding: 6px; flex-shrink: 0; }
 .todo-list-delete-btn:hover { color: var(--text-primary); }
 .note-canvas-wrapper { position: relative; max-width: 700px; margin: 0 auto 1rem; height: 420px; border: 0.5px solid var(--border-strong); border-radius: 10px; overflow: hidden; background: #ffffff; }
-.note-textarea-full { position: absolute; inset: 0; width: 100%; height: 100%; border: none; background: transparent; padding: 16px; font-size: 15px; font-family: inherit; resize: none; }
+.note-textarea-full { position: absolute; inset: 0; width: 100%; height: 100%; border: none; background: transparent; padding: 16px; font-size: 15px; font-family: inherit; overflow-y: auto; color: var(--text-primary); }
 .note-textarea-full:focus { outline: none; }
+.note-textarea-full.is-empty:before { content: attr(data-placeholder); color: var(--text-secondary); pointer-events: none; }
 .note-canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; }
 .note-toolbar { display: flex; align-items: center; gap: 10px; max-width: 700px; margin: 0 auto; position: relative; }
 .note-tool-btn { background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 10px; padding: 10px 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-primary); font-size: 18px; font-weight: 700; min-width: 48px; }
@@ -543,7 +544,7 @@ body.theme-jungle {
       <input type="text" id="noteDateInput" class="todo-date-input" placeholder="MM/DD/YYYY" maxlength="10" inputmode="numeric" oninput="handleNoteDateInput(this)" onblur="updateNoteDate(this.value)">
     </div>
     <div class="note-canvas-wrapper">
-      <textarea id="noteTextArea" class="note-textarea-full" placeholder="Write your note..." oninput="updateNoteText(this.value)"></textarea>
+      <div id="noteTextArea" class="note-textarea-full is-empty" contenteditable="true" data-placeholder="Write your note..." oninput="handleNoteTextInput(this)" onblur="saveNoteSelection()"></div>
       <canvas id="noteCanvas" class="note-canvas"></canvas>
     </div>
     <div class="note-toolbar">
@@ -800,7 +801,7 @@ function renderNotesList() {
     <div class="todo-list-card">
       <div class="todo-list-card-info" onclick="openNoteEditor('${note.id}')">
         <p class="note-card-title">${escapeHtml(note.title) || 'Untitled note'}</p>
-        <p class="note-card-snippet">${escapeHtml(note.text || '')}${note.date ? ' · ' + escapeHtml(note.date) : ''}</p>
+        <p class="note-card-snippet">${escapeHtml(stripHtml(note.text))}${note.date ? ' · ' + escapeHtml(note.date) : ''}</p>
       </div>
       <button class="todo-list-delete-btn" onclick="event.stopPropagation(); deleteNoteFromCard('${note.id}')" aria-label="Delete note" title="Delete note">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
@@ -840,6 +841,15 @@ let currentNoteColor = '#000000';
 let noteCanvasCtx = null;
 let isDrawingStroke = false;
 let activeStroke = null;
+let savedNoteRange = null;
+
+function saveNoteSelection() {
+  const sel = window.getSelection();
+  const container = document.getElementById('noteTextArea');
+  if (sel.rangeCount > 0 && container.contains(sel.getRangeAt(0).commonAncestorContainer)) {
+    savedNoteRange = sel.getRangeAt(0).cloneRange();
+  }
+}
 
 function getCurrentNote() {
   return getNotes().find(n => n.id === currentNoteId);
@@ -851,12 +861,13 @@ function openNoteEditor(id, returnTo) {
   const note = getCurrentNote();
   currentNoteTool = (note && note.tool) || 'text';
   currentNoteColor = (note && note.color) || '#000000';
+  savedNoteRange = null;
 
   document.getElementById('noteTitleInput').value = note ? note.title : '';
   document.getElementById('noteDateInput').value = note ? (note.date || '') : '';
   const textarea = document.getElementById('noteTextArea');
-  textarea.value = note ? (note.text || '') : '';
-  textarea.style.color = currentNoteColor;
+  textarea.innerHTML = note ? (note.text || '') : '';
+  textarea.classList.toggle('is-empty', textarea.textContent.trim().length === 0);
 
   document.getElementById('homeScreen').classList.add('hidden');
   document.getElementById('calendarScreen').classList.add('hidden');
@@ -916,14 +927,25 @@ function updateNoteDate(value) {
   }
 }
 
-function updateNoteText(value) {
+function handleNoteTextInput(el) {
+  el.classList.toggle('is-empty', el.textContent.trim().length === 0);
+  updateNoteText(el.innerHTML);
+}
+
+function updateNoteText(html) {
   const notes = getNotes();
   const note = notes.find(n => n.id === currentNoteId);
   if (note) {
-    note.text = value;
+    note.text = html;
     note.updatedAt = Date.now();
     saveNotesToStorage(notes);
   }
+}
+
+function stripHtml(html) {
+  const div = document.createElement('div');
+  div.innerHTML = html || '';
+  return div.textContent || '';
 }
 
 function setupNoteCanvas() {
@@ -948,7 +970,7 @@ function drawStroke(ctx, stroke) {
   ctx.strokeStyle = stroke.color;
   if (stroke.mode === 'highlighter') {
     ctx.globalAlpha = 0.35;
-    ctx.lineWidth = 16;
+    ctx.lineWidth = 26;
   } else {
     ctx.globalAlpha = 1;
     ctx.lineWidth = 3;
@@ -1022,7 +1044,7 @@ function applyNoteTool(tool) {
   const isDrawMode = tool === 'pen' || tool === 'highlighter';
   canvas.style.pointerEvents = isDrawMode ? 'auto' : 'none';
   canvas.style.cursor = isDrawMode ? 'crosshair' : 'default';
-  textarea.readOnly = isDrawMode;
+  textarea.contentEditable = isDrawMode ? 'false' : 'true';
   textarea.style.pointerEvents = isDrawMode ? 'none' : 'auto';
 
   document.getElementById('toolPenBtn').classList.toggle('active', tool === 'pen');
@@ -1030,8 +1052,28 @@ function applyNoteTool(tool) {
   document.getElementById('toolTextBtn').classList.toggle('active', tool === 'text');
 
   if (tool === 'text') {
-    textarea.focus();
+    applyTypingColor();
   }
+}
+
+function applyTypingColor() {
+  const textarea = document.getElementById('noteTextArea');
+  textarea.focus();
+  const sel = window.getSelection();
+  if (savedNoteRange && textarea.contains(savedNoteRange.commonAncestorContainer)) {
+    sel.removeAllRanges();
+    sel.addRange(savedNoteRange);
+  } else if (sel.rangeCount === 0 || !textarea.contains(sel.getRangeAt(0).commonAncestorContainer)) {
+    const range = document.createRange();
+    range.selectNodeContents(textarea);
+    range.collapse(false);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+  try {
+    document.execCommand('styleWithCSS', false, true);
+    document.execCommand('foreColor', false, currentNoteColor);
+  } catch (e) {}
 }
 
 function renderColorPickerOptions() {
@@ -1053,7 +1095,9 @@ function selectNoteColor(hex) {
     note.updatedAt = Date.now();
     saveNotesToStorage(notes);
   }
-  document.getElementById('noteTextArea').style.color = hex;
+  if (currentNoteTool === 'text') {
+    applyTypingColor();
+  }
   updateColorSwatch();
   renderColorPickerOptions();
   document.getElementById('colorPickerPopup').classList.add('hidden');
