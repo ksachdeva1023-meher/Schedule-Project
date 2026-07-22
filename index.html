@@ -26,6 +26,7 @@ html, body {
 }
 
 * { box-sizing: border-box; }
+button, input, textarea, select { font-family: inherit; }
 .app-container { padding: 1.5rem; background-color: var(--surface-0); min-height: 100vh; transition: background-color 0.3s ease; }
 .header-top { position: fixed; top: 16px; right: 16px; z-index: 100; display: flex; gap: 12px; }
 .settings-button { background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 12px; padding: 18px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); }
@@ -122,7 +123,8 @@ html, body {
 .calendar-nav-btn { background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 8px; padding: 6px 14px; cursor: pointer; font-size: 16px; color: var(--text-primary); }
 .calendar-nav-btn:hover { background: var(--surface-2); border-color: var(--border-stronger); }
 .calendar-nav h3 { margin: 0; font-size: 16px; font-weight: 500; color: var(--text-primary); }
-.calendar-today-btn { background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 8px; padding: 6px 12px; cursor: pointer; font-size: 13px; color: var(--text-primary); }
+.calendar-today-row { max-width: 700px; margin: 0 auto 14px; display: flex; justify-content: flex-end; }
+.calendar-today-btn { background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 8px; padding: 8px 18px; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text-primary); }
 .calendar-today-btn:hover { background: var(--surface-2); border-color: var(--border-stronger); }
 .calendar-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; max-width: 700px; margin: 0 auto 6px; text-align: center; font-size: 12px; color: var(--text-secondary); font-weight: 500; }
 .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; max-width: 700px; margin: 0 auto; }
@@ -134,25 +136,26 @@ html, body {
 .calendar-day-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--fill-accent); position: absolute; bottom: 6px; right: 6px; }
 .day-task-delete { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 14px; padding: 2px 6px; flex-shrink: 0; }
 .day-empty-tasks { color: var(--text-secondary); font-size: 13px; text-align: center; padding: 8px 0; }
-.day-allday-section { max-width: 700px; margin: 0 auto 1.5rem; background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 10px; padding: 12px 16px; }
-.day-allday-header { display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-bottom: 8px; }
-.day-allday-tasks { display: flex; flex-direction: column; gap: 6px; }
-.day-add-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 16px; padding: 2px 6px; line-height: 1; }
-.day-add-btn:hover { color: var(--text-primary); }
+.day-title-card { max-width: 700px; margin: 0 auto 1.5rem; background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 16px; padding: 16px; }
+.day-title-input { width: 100%; border: none; background: transparent; font-size: 18px; font-weight: 500; color: var(--text-primary); padding: 8px 4px; margin-bottom: 10px; }
+.day-title-input:focus { outline: none; }
+.day-title-input::placeholder { color: var(--text-secondary); }
+.import-btn { background: var(--surface-0); border: 0.5px solid var(--border-strong); border-radius: var(--radius); padding: 8px 14px; font-size: 13px; font-weight: 500; color: var(--text-primary); cursor: pointer; }
+.import-btn:hover { background: var(--surface-2); border-color: var(--border-stronger); }
+.linked-items-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.linked-item-chip { display: flex; align-items: center; gap: 2px; background: var(--bg-accent); border-radius: 999px; padding: 4px 4px 4px 14px; }
+.linked-item-btn { background: none; border: none; color: var(--text-accent); font-size: 13px; font-weight: 500; cursor: pointer; padding: 2px 0; }
+.linked-item-remove { background: none; border: none; color: var(--text-accent); cursor: pointer; font-size: 12px; padding: 2px 8px; }
 .hourly-schedule { max-width: 700px; margin: 0 auto; border-top: 0.5px solid var(--border-strong); }
 .hour-row { border-bottom: 0.5px solid var(--border-strong); padding: 10px 4px; }
 .hour-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; }
-.hour-content { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; min-height: 20px; }
-.hour-tasks { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.hour-tasks { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
 .hour-task-chip { display: flex; align-items: center; gap: 8px; background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 6px; padding: 6px 8px; }
 .hour-task-chip input[type="checkbox"] { cursor: pointer; flex-shrink: 0; }
 .hour-task-text { flex: 1; font-size: 13px; color: var(--text-primary); word-break: break-word; }
 .hour-task-chip.completed .hour-task-text { text-decoration: line-through; color: var(--text-secondary); }
-.hour-add-form { display: flex; gap: 8px; margin-top: 8px; }
-.hour-add-form input { flex: 1; padding: 6px 10px; border: 0.5px solid var(--border-strong); border-radius: var(--radius); font-size: 13px; background: var(--surface-1); color: var(--text-primary); }
-.hour-add-form input:focus { outline: none; border-color: var(--border-accent); box-shadow: 0 0 0 2px var(--bg-accent); }
-.hour-add-form button { background: var(--fill-accent); color: var(--on-accent); border: none; border-radius: var(--radius); padding: 0 12px; cursor: pointer; font-size: 13px; }
-.hour-add-form button:hover { background: var(--fill-accent-hover); }
+.hour-input { width: 100%; padding: 6px 10px; border: 0.5px solid var(--border-strong); border-radius: var(--radius); font-size: 13px; background: var(--surface-1); color: var(--text-primary); }
+.hour-input:focus { outline: none; border-color: var(--border-accent); box-shadow: 0 0 0 2px var(--bg-accent); }
 
 body.font-serif { --font-primary: 'Georgia', 'Times New Roman', serif; }
 body.font-mono { --font-primary: 'Courier New', 'Courier', monospace; }
@@ -374,6 +377,17 @@ body.theme-jungle {
   </div>
 </div>
 
+<div id="importPickerModal" class="modal-overlay hidden">
+  <div class="modal-card">
+    <div class="modal-header-top">
+      <button class="modal-close-btn" onclick="closeImportPicker()" aria-label="Back">←</button>
+      <h3 class="modal-header">Import a checklist or note</h3>
+      <div style="width: 32px;"></div>
+    </div>
+    <div id="importPickerList" class="profile-list"></div>
+  </div>
+</div>
+
 <div id="noteEditorModal" class="modal-overlay hidden">
   <div class="modal-card">
     <div class="modal-header-top">
@@ -441,6 +455,9 @@ body.theme-jungle {
     <div class="header-bar">
       <button onclick="switchView('home')" aria-label="Back to home">←</button>
       <h2>Calendar</h2>
+      <div style="width: 32px;"></div>
+    </div>
+    <div class="calendar-today-row">
       <button class="calendar-today-btn" onclick="goToToday()">Today</button>
     </div>
     <div class="calendar-nav">
@@ -460,16 +477,10 @@ body.theme-jungle {
       <h2 id="dayViewTitle">Date</h2>
       <div style="width: 32px;"></div>
     </div>
-    <div class="day-allday-section">
-      <div class="day-allday-header">
-        <span>All day</span>
-        <button class="day-add-btn" onclick="toggleAddForm('allday')" aria-label="Add all-day task"><i class="ti ti-plus" aria-hidden="true"></i></button>
-      </div>
-      <div id="dayAlldayTasks" class="day-allday-tasks"></div>
-      <div id="dayAlldayAddForm" class="hour-add-form hidden">
-        <input type="text" id="dayAlldayInput" placeholder="Add all-day task..." onkeydown="if(event.key==='Enter') submitAddForm('allday')">
-        <button onclick="submitAddForm('allday')">Add</button>
-      </div>
+    <div class="day-title-card">
+      <input type="text" id="dayTitleInput" class="day-title-input" placeholder="Add a title" onblur="saveDayTitle(this.value)" onkeydown="if(event.key==='Enter'){ this.blur(); }">
+      <button class="import-btn" onclick="openImportPicker()">Import a checklist or note</button>
+      <div id="linkedItemsList" class="linked-items-list"></div>
     </div>
     <div id="hourlySchedule" class="hourly-schedule"></div>
   </div>
@@ -891,11 +902,8 @@ const HOUR_LABELS = Array.from({ length: 24 }, (_, h) => {
   return displayHour + ' ' + period;
 });
 
-let activeAddSlot = null;
-
 function openDayView(dateStr) {
   selectedDayStr = dateStr;
-  activeAddSlot = null;
   const [y, m, d] = dateStr.split('-').map(Number);
   document.getElementById('dayViewTitle').textContent = MONTH_NAMES[m - 1] + ' ' + d + ', ' + y;
   renderDayView();
@@ -909,6 +917,85 @@ function closeDayView() {
   renderCalendar();
 }
 
+function getDayMeta(dateStr) {
+  const saved = localStorage.getItem('dayMeta');
+  const all = saved ? JSON.parse(saved) : {};
+  return all[dateStr] || { title: '', linked: [] };
+}
+
+function saveDayMeta(dateStr, meta) {
+  const saved = localStorage.getItem('dayMeta');
+  const all = saved ? JSON.parse(saved) : {};
+  all[dateStr] = meta;
+  localStorage.setItem('dayMeta', JSON.stringify(all));
+}
+
+function saveDayTitle(value) {
+  const meta = getDayMeta(selectedDayStr);
+  meta.title = value;
+  saveDayMeta(selectedDayStr, meta);
+}
+
+function openImportPicker() {
+  const notes = getNotes();
+  const list = document.getElementById('importPickerList');
+  list.innerHTML = notes.length
+    ? notes.map(n => `
+        <div class="profile-item" style="cursor: pointer;" onclick="importItem('note', '${n.id}')">
+          <div class="profile-item-details">
+            <div class="profile-item-name">${escapeHtml(n.title) || 'Untitled note'}</div>
+          </div>
+        </div>
+      `).join('')
+    : '<p class="day-empty-tasks">You don\'t have any notes yet.</p>';
+  document.getElementById('importPickerModal').classList.remove('hidden');
+}
+
+function closeImportPicker() {
+  document.getElementById('importPickerModal').classList.add('hidden');
+}
+
+function importItem(type, id) {
+  const meta = getDayMeta(selectedDayStr);
+  if (!meta.linked.some(l => l.type === type && l.id === id)) {
+    meta.linked.push({ type, id });
+    saveDayMeta(selectedDayStr, meta);
+  }
+  closeImportPicker();
+  renderLinkedItems();
+}
+
+function removeLinkedItem(type, id) {
+  const meta = getDayMeta(selectedDayStr);
+  meta.linked = meta.linked.filter(l => !(l.type === type && l.id === id));
+  saveDayMeta(selectedDayStr, meta);
+  renderLinkedItems();
+}
+
+function openLinkedItem(type, id) {
+  if (type === 'note') {
+    openNoteEditor(id);
+  }
+}
+
+function renderLinkedItems() {
+  const meta = getDayMeta(selectedDayStr);
+  const container = document.getElementById('linkedItemsList');
+  container.innerHTML = meta.linked.map(l => {
+    let label = 'Deleted item';
+    if (l.type === 'note') {
+      const note = getNotes().find(n => n.id === l.id);
+      if (note) label = note.title || 'Untitled note';
+    }
+    return `
+      <div class="linked-item-chip">
+        <button class="linked-item-btn" onclick="openLinkedItem('${l.type}', '${l.id}')">${escapeHtml(label)}</button>
+        <button class="linked-item-remove" onclick="removeLinkedItem('${l.type}', '${l.id}')" aria-label="Remove">✕</button>
+      </div>
+    `;
+  }).join('');
+}
+
 function taskChipHtml(t) {
   return `
     <div class="hour-task-chip ${t.completed ? 'completed' : ''}">
@@ -920,60 +1007,34 @@ function taskChipHtml(t) {
 }
 
 function renderDayView() {
+  document.getElementById('dayTitleInput').value = getDayMeta(selectedDayStr).title || '';
+  renderLinkedItems();
+
   const tasks = getTasks().filter(t => t.date === selectedDayStr);
-  const alldayTasks = tasks.filter(t => t.hour === undefined || t.hour === null);
-
-  const alldayList = document.getElementById('dayAlldayTasks');
-  alldayList.innerHTML = alldayTasks.length
-    ? alldayTasks.map(taskChipHtml).join('')
-    : '<p class="day-empty-tasks">No all-day tasks.</p>';
-
-  const alldayForm = document.getElementById('dayAlldayAddForm');
-  alldayForm.classList.toggle('hidden', activeAddSlot !== 'allday');
-
   let html = '';
   for (let h = 0; h < 24; h++) {
     const hourTasks = tasks.filter(t => t.hour === h);
     html += `
       <div class="hour-row">
         <div class="hour-label">${HOUR_LABELS[h]}</div>
-        <div class="hour-content">
-          <div class="hour-tasks">${hourTasks.map(taskChipHtml).join('')}</div>
-          <button class="day-add-btn" onclick="toggleAddForm(${h})" aria-label="Add task at ${HOUR_LABELS[h]}"><i class="ti ti-plus" aria-hidden="true"></i></button>
-        </div>
-        <div class="hour-add-form ${activeAddSlot === h ? '' : 'hidden'}" id="hourAddForm-${h}">
-          <input type="text" id="hourInput-${h}" placeholder="Add task..." onkeydown="if(event.key==='Enter') submitAddForm(${h})">
-          <button onclick="submitAddForm(${h})">Add</button>
-        </div>
+        <div class="hour-tasks">${hourTasks.map(taskChipHtml).join('')}</div>
+        <input type="text" class="hour-input" id="hourInput-${h}" placeholder="Add..." onkeydown="if(event.key==='Enter'){ addHourTaskFromInput(${h}); }">
       </div>
     `;
   }
   document.getElementById('hourlySchedule').innerHTML = html;
-
-  if (activeAddSlot === 'allday') {
-    document.getElementById('dayAlldayInput').focus();
-  } else if (typeof activeAddSlot === 'number') {
-    const el = document.getElementById('hourInput-' + activeAddSlot);
-    if (el) el.focus();
-  }
 }
 
-function toggleAddForm(slot) {
-  activeAddSlot = (activeAddSlot === slot) ? null : slot;
-  renderDayView();
-}
-
-function submitAddForm(slot) {
-  const inputId = slot === 'allday' ? 'dayAlldayInput' : ('hourInput-' + slot);
-  const text = document.getElementById(inputId).value.trim();
+function addHourTaskFromInput(hour) {
+  const input = document.getElementById('hourInput-' + hour);
+  const text = input.value.trim();
   if (!text) return;
   const tasks = getTasks();
-  const newTask = { id: 'task_' + Date.now(), text: text, date: selectedDayStr, completed: false, createdAt: Date.now() };
-  if (slot !== 'allday') newTask.hour = slot;
-  tasks.push(newTask);
+  tasks.push({ id: 'task_' + Date.now(), text: text, date: selectedDayStr, hour: hour, completed: false, createdAt: Date.now() });
   saveTasksToStorage(tasks);
-  activeAddSlot = null;
   renderDayView();
+  const freshInput = document.getElementById('hourInput-' + hour);
+  if (freshInput) freshInput.focus();
 }
 
 function toggleDayTask(id) {
