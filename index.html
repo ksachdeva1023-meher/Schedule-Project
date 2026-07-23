@@ -70,6 +70,20 @@ button, input, textarea, select { font-family: inherit; }
 .pencil-tip-lead { width: 0; height: 0; border-top: 4px solid transparent; border-bottom: 4px solid transparent; border-left: 6px solid #3a2a1a; margin-left: -1px; }
 .option-card h2 { font-size: 21px; font-weight: 500; color: var(--text-primary); margin: 0 0 8px; }
 .option-card p { font-size: 15px; color: var(--text-secondary); margin: 0; }
+.week-glance-btn { background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 16px; padding: 20px 48px; font-size: 18px; font-weight: 500; color: var(--text-primary); cursor: pointer; transition: all 0.2s; }
+.week-glance-btn:hover { border-color: var(--border-stronger); background: var(--surface-2); }
+.week-glance-btn:active { transform: scale(0.98); }
+.week-days-list { display: flex; flex-direction: column; gap: 10px; max-width: 700px; margin: 0 auto; }
+.week-day-card { background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 12px; padding: 14px 16px; cursor: pointer; transition: all 0.2s; }
+.week-day-card:hover { border-color: var(--border-stronger); background: var(--surface-2); }
+.week-day-card.today { border: 2px solid var(--fill-accent); }
+.week-day-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; gap: 12px; }
+.week-day-name { font-size: 15px; font-weight: 500; color: var(--text-primary); }
+.week-day-date { font-size: 13px; color: var(--text-secondary); flex-shrink: 0; }
+.week-day-items { display: flex; flex-direction: column; gap: 4px; }
+.week-day-item { font-size: 13px; color: var(--text-primary); display: flex; gap: 10px; }
+.week-day-item-time { color: var(--text-secondary); flex-shrink: 0; min-width: 62px; }
+.week-day-empty { font-size: 13px; color: var(--text-secondary); font-style: italic; }
 .hidden { display: none !important; }
 .header-bar { display: flex; align-items: center; gap: 12px; margin-top: 6.5rem; margin-bottom: 1.5rem; }
 .header-bar button { background: none; border: none; padding: 4px 8px; color: var(--text-secondary); cursor: pointer; font-size: 18px; display: flex; align-items: center; gap: 8px; }
@@ -619,6 +633,7 @@ body.theme-sunshine {
         <p>Write down your thoughts</p>
       </div>
     </div>
+    <button class="week-glance-btn" onclick="switchView('week')">This Week at a Glance</button>
   </div>
 
   <div id="calendarScreen" class="hidden">
@@ -649,6 +664,22 @@ body.theme-sunshine {
       <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
     </div>
     <div id="calendarGrid" class="calendar-grid"></div>
+  </div>
+
+  <div id="weekScreen" class="hidden">
+    <div class="header-bar">
+      <button class="back-arrow-lg" onclick="switchView('home')" aria-label="Back to home">←</button>
+      <div style="flex: 1;"></div>
+    </div>
+    <div class="calendar-today-row">
+      <button class="calendar-today-btn" onclick="goToThisWeek()">This Week</button>
+    </div>
+    <div class="calendar-nav">
+      <button class="calendar-nav-btn" onclick="changeWeek(-1)" aria-label="Previous week">‹</button>
+      <h3 id="weekRangeLabel">Week</h3>
+      <button class="calendar-nav-btn" onclick="changeWeek(1)" aria-label="Next week">›</button>
+    </div>
+    <div id="weekDaysList" class="week-days-list"></div>
   </div>
 
   <div id="dayViewScreen" class="hidden">
@@ -1546,6 +1577,7 @@ function dateToStr(year, month, day) {
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 let calendarViewYear, calendarViewMonth, selectedDayStr;
+let dayViewReturnTo = 'calendar';
 
 function initCalendar() {
   const today = new Date();
@@ -1614,17 +1646,92 @@ const HOUR_LABELS = Array.from({ length: 24 }, (_, h) => {
   return displayHour + ' ' + period;
 });
 
-function openDayView(dateStr) {
+function openDayView(dateStr, returnTo) {
   selectedDayStr = dateStr;
+  dayViewReturnTo = returnTo || 'calendar';
   renderDayView();
   document.getElementById('calendarScreen').classList.add('hidden');
+  document.getElementById('weekScreen').classList.add('hidden');
   document.getElementById('dayViewScreen').classList.remove('hidden');
 }
 
 function closeDayView() {
   document.getElementById('dayViewScreen').classList.add('hidden');
-  document.getElementById('calendarScreen').classList.remove('hidden');
-  renderCalendar();
+  if (dayViewReturnTo === 'week') {
+    document.getElementById('weekScreen').classList.remove('hidden');
+    renderWeekView();
+  } else {
+    document.getElementById('calendarScreen').classList.remove('hidden');
+    renderCalendar();
+  }
+}
+
+const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+let weekViewStartDate = null;
+
+function getWeekStart(date) {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() - d.getDay());
+  return d;
+}
+
+function initWeekView() {
+  weekViewStartDate = getWeekStart(new Date());
+}
+
+function goToThisWeek() {
+  weekViewStartDate = getWeekStart(new Date());
+  renderWeekView();
+}
+
+function changeWeek(delta) {
+  weekViewStartDate.setDate(weekViewStartDate.getDate() + delta * 7);
+  renderWeekView();
+}
+
+function renderWeekView() {
+  if (!weekViewStartDate) initWeekView();
+
+  const weekEnd = new Date(weekViewStartDate);
+  weekEnd.setDate(weekEnd.getDate() + 6);
+  const rangeLabel = weekEnd.getMonth() === weekViewStartDate.getMonth()
+    ? MONTH_NAMES[weekViewStartDate.getMonth()] + ' ' + weekViewStartDate.getDate() + '–' + weekEnd.getDate() + ', ' + weekEnd.getFullYear()
+    : MONTH_NAMES[weekViewStartDate.getMonth()] + ' ' + weekViewStartDate.getDate() + ' – ' + MONTH_NAMES[weekEnd.getMonth()] + ' ' + weekEnd.getDate() + ', ' + weekEnd.getFullYear();
+  document.getElementById('weekRangeLabel').textContent = rangeLabel;
+
+  const tasks = getTasks();
+  const today = new Date();
+  const todayStr = dateToStr(today.getFullYear(), today.getMonth(), today.getDate());
+
+  let html = '';
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(weekViewStartDate);
+    d.setDate(d.getDate() + i);
+    const dateStr = dateToStr(d.getFullYear(), d.getMonth(), d.getDate());
+    const dayTasks = tasks.filter(t => t.date === dateStr).sort((a, b) => a.hour - b.hour);
+    const meta = getDayMeta(dateStr);
+    const isToday = dateStr === todayStr;
+
+    html += `
+      <div class="week-day-card ${isToday ? 'today' : ''}" onclick="openDayView('${dateStr}', 'week')">
+        <div class="week-day-header">
+          <span class="week-day-name">${WEEKDAY_NAMES[d.getDay()]}${meta.title ? ' — ' + escapeHtml(meta.title) : ''}</span>
+          <span class="week-day-date">${MONTH_NAMES[d.getMonth()]} ${d.getDate()}</span>
+        </div>
+        <div class="week-day-items">
+          ${dayTasks.length ? dayTasks.map(t => `
+            <div class="week-day-item">
+              <span class="week-day-item-time">${HOUR_LABELS[t.hour]}</span>
+              <span>${escapeHtml(t.text)}</span>
+            </div>
+          `).join('') : '<div class="week-day-empty">Nothing planned</div>'}
+        </div>
+      </div>
+    `;
+  }
+  document.getElementById('weekDaysList').innerHTML = html;
 }
 
 function getDayMeta(dateStr) {
@@ -2083,6 +2190,7 @@ function addTodoSubItem() {
 function switchView(view) {
   document.getElementById('homeScreen').classList.toggle('hidden', view !== 'home');
   document.getElementById('calendarScreen').classList.toggle('hidden', view !== 'calendar');
+  document.getElementById('weekScreen').classList.toggle('hidden', view !== 'week');
   document.getElementById('todolistScreen').classList.toggle('hidden', view !== 'todolist');
   document.getElementById('notesScreen').classList.toggle('hidden', view !== 'notes');
   if (view === 'notes') {
@@ -2090,6 +2198,9 @@ function switchView(view) {
   }
   if (view === 'calendar') {
     renderCalendar();
+  }
+  if (view === 'week') {
+    renderWeekView();
   }
   if (view === 'todolist') {
     renderTodoListsScreen();
