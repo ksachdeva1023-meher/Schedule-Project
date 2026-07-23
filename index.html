@@ -762,12 +762,12 @@ const PROFILE_PICTURES = [
 let selectedProfilePicture = 'star';
 
 function getSettings() {
-  const saved = localStorage.getItem('appSettings');
+  const saved = getScopedItem('appSettings');
   return saved ? JSON.parse(saved) : { theme: 'default', font: 'sans', size: 1 };
 }
 
 function saveSettings(settings) {
-  localStorage.setItem('appSettings', JSON.stringify(settings));
+  setScopedItem('appSettings', JSON.stringify(settings));
   applySettings(settings);
 }
 
@@ -866,6 +866,27 @@ function getCurrentProfileId() {
   return localStorage.getItem('currentProfileId') || 'default';
 }
 
+// Each profile gets its own copy of settings/notes/tasks/etc, stored under
+// "<baseKey>_<profileId>". The very first profile ('default') migrates its
+// data forward from the old unscoped keys the app used before profiles kept
+// separate data, so existing users don't lose anything.
+function getScopedItem(baseKey) {
+  const scopedKey = baseKey + '_' + getCurrentProfileId();
+  let saved = localStorage.getItem(scopedKey);
+  if (saved === null && getCurrentProfileId() === 'default') {
+    const legacy = localStorage.getItem(baseKey);
+    if (legacy !== null) {
+      localStorage.setItem(scopedKey, legacy);
+      saved = legacy;
+    }
+  }
+  return saved;
+}
+
+function setScopedItem(baseKey, value) {
+  localStorage.setItem(baseKey + '_' + getCurrentProfileId(), value);
+}
+
 function getCurrentProfile() {
   const id = getCurrentProfileId();
   const profiles = getAllProfiles();
@@ -887,6 +908,19 @@ function saveProfileToStorage(profile) {
 
 function setCurrentProfile(profileId) {
   localStorage.setItem('currentProfileId', profileId);
+
+  // Each profile has its own notes/tasks/to-do lists, so any editor screen
+  // left open would be pointing at IDs that belong to the previous profile.
+  currentNoteId = null;
+  currentTodoListId = null;
+  selectedDayStr = null;
+  document.getElementById('dayViewScreen').classList.add('hidden');
+  document.getElementById('todoEditorScreen').classList.add('hidden');
+  document.getElementById('noteEditorScreen').classList.add('hidden');
+  switchView('home');
+
+  applySettings(getSettings());
+  updateNotificationsUI();
   updateProfileDisplay();
   renderProfilesList();
 }
@@ -1032,12 +1066,12 @@ function createNewProfile() {
 }
 
 function getNotes() {
-  const saved = localStorage.getItem('appNotes');
+  const saved = getScopedItem('appNotes');
   return saved ? JSON.parse(saved) : [];
 }
 
 function saveNotesToStorage(notes) {
-  localStorage.setItem('appNotes', JSON.stringify(notes));
+  setScopedItem('appNotes', JSON.stringify(notes));
 }
 
 function escapeHtml(str) {
@@ -1495,12 +1529,12 @@ function updateColorSwatch() {
 }
 
 function getTasks() {
-  const saved = localStorage.getItem('appTasks');
+  const saved = getScopedItem('appTasks');
   return saved ? JSON.parse(saved) : [];
 }
 
 function saveTasksToStorage(tasks) {
-  localStorage.setItem('appTasks', JSON.stringify(tasks));
+  setScopedItem('appTasks', JSON.stringify(tasks));
 }
 
 function pad2(n) { return String(n).padStart(2, '0'); }
@@ -1594,16 +1628,16 @@ function closeDayView() {
 }
 
 function getDayMeta(dateStr) {
-  const saved = localStorage.getItem('dayMeta');
+  const saved = getScopedItem('dayMeta');
   const all = saved ? JSON.parse(saved) : {};
   return all[dateStr] || { title: '', linked: [] };
 }
 
 function saveDayMeta(dateStr, meta) {
-  const saved = localStorage.getItem('dayMeta');
+  const saved = getScopedItem('dayMeta');
   const all = saved ? JSON.parse(saved) : {};
   all[dateStr] = meta;
-  localStorage.setItem('dayMeta', JSON.stringify(all));
+  setScopedItem('dayMeta', JSON.stringify(all));
 }
 
 function saveDayTitle(value) {
@@ -1749,11 +1783,11 @@ function deleteDayTask(id) {
 const NOTIFIED_TASKS_KEY = 'notifiedTasksState';
 
 function areNotificationsEnabled() {
-  return localStorage.getItem('notificationsEnabled') === 'true';
+  return getScopedItem('notificationsEnabled') === 'true';
 }
 
 function setNotificationsEnabled(enabled) {
-  localStorage.setItem('notificationsEnabled', enabled ? 'true' : 'false');
+  setScopedItem('notificationsEnabled', enabled ? 'true' : 'false');
 }
 
 function updateNotificationsUI() {
@@ -1793,7 +1827,7 @@ function todayDateStr() {
 }
 
 function getNotifiedState() {
-  const saved = localStorage.getItem(NOTIFIED_TASKS_KEY);
+  const saved = getScopedItem(NOTIFIED_TASKS_KEY);
   const state = saved ? JSON.parse(saved) : { date: '', ids: [] };
   if (state.date !== todayDateStr()) {
     return { date: todayDateStr(), ids: [] };
@@ -1804,7 +1838,7 @@ function getNotifiedState() {
 function markTaskNotified(taskId) {
   const state = getNotifiedState();
   state.ids.push(taskId);
-  localStorage.setItem(NOTIFIED_TASKS_KEY, JSON.stringify(state));
+  setScopedItem(NOTIFIED_TASKS_KEY, JSON.stringify(state));
 }
 
 function checkReminders() {
@@ -1830,12 +1864,12 @@ function escapeAttr(str) {
 }
 
 function getTodoLists() {
-  const saved = localStorage.getItem('todoLists');
+  const saved = getScopedItem('todoLists');
   return saved ? JSON.parse(saved) : [];
 }
 
 function saveTodoListsToStorage(lists) {
-  localStorage.setItem('todoLists', JSON.stringify(lists));
+  setScopedItem('todoLists', JSON.stringify(lists));
 }
 
 function getCurrentTodoList() {
