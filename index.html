@@ -47,8 +47,8 @@ button, input, textarea, select { font-family: inherit; }
 .home-header { text-align: center; }
 .home-header h1 { font-size: 38px; font-weight: 500; color: var(--text-primary); margin: 0 0 8px; }
 .home-header p { font-size: 25px; color: var(--text-secondary); margin: 14px 0 0; }
-.options-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; width: 100%; max-width: 1000px; }
-.option-card { background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 16px; padding: 3.5rem 2.5rem; text-align: center; cursor: pointer; transition: all 0.2s; }
+.options-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 24px; width: 100%; max-width: 1000px; }
+.option-card { background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 16px; padding: 3.5rem 2.5rem; text-align: center; cursor: pointer; transition: all 0.2s; flex: 0 1 260px; }
 .option-card:hover { border-color: var(--border-stronger); background: var(--surface-2); }
 .option-card:active { transform: scale(0.98); }
 .option-icon { font-size: 40px; margin-bottom: 14px; color: var(--text-accent); }
@@ -78,9 +78,10 @@ button, input, textarea, select { font-family: inherit; }
 .event-confetti-3 { bottom: 24px; right: 10px; background: #ffd166; }
 .option-card h2 { font-size: 21px; font-weight: 500; color: var(--text-primary); margin: 0 0 8px; }
 .option-card p { font-size: 15px; color: var(--text-secondary); margin: 0; }
-.week-glance-btn { background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 16px; padding: 30px 72px; font-size: 24px; font-weight: 500; color: var(--text-primary); cursor: pointer; transition: all 0.2s; width: 100%; max-width: 500px; }
-.week-glance-btn:hover { border-color: var(--border-stronger); background: var(--surface-2); }
-.week-glance-btn:active { transform: scale(0.98); }
+.week-icon-shape { width: 96px; height: 96px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; transform: scale(1.1); }
+.week-icon-row { display: flex; gap: 4px; }
+.week-icon-row span { width: 10px; height: 40px; border-radius: 4px; background: #7ba6f9; }
+.week-icon-row span:nth-child(4) { background: #f4879a; }
 .week-days-list { display: flex; flex-direction: column; gap: 10px; max-width: 700px; margin: 0 auto; }
 .week-day-card { background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 12px; padding: 14px 16px; cursor: pointer; transition: all 0.2s; }
 .week-day-card:hover { border-color: var(--border-stronger); background: var(--surface-2); }
@@ -682,8 +683,16 @@ body.theme-sunshine {
         <h2>Plan an Event</h2>
         <p>Plan get-togethers and outings</p>
       </div>
+      <div class="option-card" onclick="switchView('week')">
+        <div class="week-icon-shape">
+          <div class="week-icon-row">
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+        <h2>This Week at a Glance</h2>
+        <p>See your whole week at once</p>
+      </div>
     </div>
-    <button class="week-glance-btn" onclick="switchView('week')">This Week at a Glance</button>
   </div>
 
   <div id="calendarScreen" class="hidden">
