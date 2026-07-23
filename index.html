@@ -219,7 +219,7 @@ button, input, textarea, select { font-family: inherit; }
 .todo-add-row { display: flex; gap: 10px; max-width: 700px; margin: 0 auto; }
 .todo-add-btn { flex: 1; padding: 10px 14px; border-radius: var(--radius); border: 0.5px solid var(--border-strong); background: var(--surface-1); color: var(--text-primary); cursor: pointer; font-size: 13px; font-weight: 500; }
 .todo-add-btn:hover { background: var(--surface-2); border-color: var(--border-stronger); }
-.import-picker-card { max-width: 560px; }
+.import-picker-card { max-width: 720px; }
 .import-picker-columns { display: flex; gap: 16px; }
 .import-picker-column { flex: 1; min-width: 0; }
 .import-picker-column-title { font-size: 13px; font-weight: 500; color: var(--text-secondary); margin: 0 0 8px; }
@@ -629,7 +629,7 @@ body.theme-sunshine {
   <div class="modal-card import-picker-card">
     <div class="modal-header-top">
       <button class="modal-close-btn" onclick="closeImportPicker()" aria-label="Back">←</button>
-      <h3 class="modal-header">Import a checklist or note</h3>
+      <h3 class="modal-header">Import a Note, Checklist, or Event Plan</h3>
       <div style="width: 32px;"></div>
     </div>
     <div class="import-picker-columns">
@@ -640,6 +640,10 @@ body.theme-sunshine {
       <div class="import-picker-column">
         <p class="import-picker-column-title">Notes</p>
         <div id="importPickerNoteList" class="profile-list"></div>
+      </div>
+      <div class="import-picker-column">
+        <p class="import-picker-column-title">Event Plans</p>
+        <div id="importPickerEventList" class="profile-list"></div>
       </div>
     </div>
   </div>
@@ -758,7 +762,7 @@ body.theme-sunshine {
     </div>
     <div class="day-title-card">
       <input type="text" id="dayTitleInput" class="day-title-input" placeholder="Add a title" onblur="saveDayTitle(this.value)" onkeydown="if(event.key==='Enter'){ this.blur(); }">
-      <button class="import-btn" onclick="openImportPicker()">Import a checklist or note</button>
+      <button class="import-btn" onclick="openImportPicker()">Import a Note, Checklist, or Event Plan</button>
       <div id="linkedItemsList" class="linked-items-list"></div>
     </div>
     <div id="hourlySchedule" class="hourly-schedule"></div>
@@ -1892,6 +1896,7 @@ function saveDayTitle(value) {
 function openImportPicker() {
   const notes = getNotes();
   const todoLists = getTodoLists();
+  const events = getEvents();
 
   document.getElementById('importPickerTodoList').innerHTML = todoLists.length
     ? todoLists.map(t => `
@@ -1912,6 +1917,16 @@ function openImportPicker() {
         </div>
       `).join('')
     : '<p class="day-empty-tasks">No notes yet.</p>';
+
+  document.getElementById('importPickerEventList').innerHTML = events.length
+    ? events.map(e => `
+        <div class="profile-item" style="cursor: pointer;" onclick="importItem('event', '${e.id}')">
+          <div class="profile-item-details">
+            <div class="profile-item-name">${escapeHtml(e.title) || 'Untitled event'}</div>
+          </div>
+        </div>
+      `).join('')
+    : '<p class="day-empty-tasks">No event plans yet.</p>';
 
   document.getElementById('importPickerModal').classList.remove('hidden');
 }
@@ -1942,6 +1957,8 @@ function openLinkedItem(type, id) {
     openNoteEditor(id, 'dayview');
   } else if (type === 'todo') {
     openTodoEditor(id, 'dayview');
+  } else if (type === 'event') {
+    openEventEditor(id, 'dayview');
   }
 }
 
@@ -1956,6 +1973,9 @@ function renderLinkedItems() {
     } else if (l.type === 'todo') {
       const todoList = getTodoLists().find(t => t.id === l.id);
       if (todoList) label = todoList.title || 'Untitled list';
+    } else if (l.type === 'event') {
+      const eventPlan = getEvents().find(e => e.id === l.id);
+      if (eventPlan) label = eventPlan.title || 'Untitled event';
     }
     return `
       <div class="linked-item-chip">
@@ -2170,19 +2190,28 @@ function getCurrentEvent() {
   return getEvents().find(e => e.id === currentEventId);
 }
 
-function openEventEditor(id) {
+let eventEditorReturnTo = 'events';
+
+function openEventEditor(id, returnTo) {
   currentEventId = id;
+  eventEditorReturnTo = returnTo || 'events';
   renderEventEditor();
   document.getElementById('homeScreen').classList.add('hidden');
   document.getElementById('eventsScreen').classList.add('hidden');
+  document.getElementById('dayViewScreen').classList.add('hidden');
   document.getElementById('eventEditorScreen').classList.remove('hidden');
 }
 
 function closeEventEditor() {
   document.getElementById('eventEditorScreen').classList.add('hidden');
   currentEventId = null;
-  document.getElementById('eventsScreen').classList.remove('hidden');
-  renderEventsScreen();
+  if (eventEditorReturnTo === 'dayview') {
+    document.getElementById('dayViewScreen').classList.remove('hidden');
+    renderLinkedItems();
+  } else {
+    document.getElementById('eventsScreen').classList.remove('hidden');
+    renderEventsScreen();
+  }
 }
 
 function deleteCurrentEvent() {
