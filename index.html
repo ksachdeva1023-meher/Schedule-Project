@@ -227,6 +227,22 @@ body.font-comic { --font-primary: 'Comic Neue', cursive; }
 body.size-2 { zoom: 1.15; }
 body.size-3 { zoom: 1.3; }
 
+body.theme-default {
+  --surface-0: #f5f5f5;
+  --surface-1: #ffffff;
+  --surface-2: #e8e8e8;
+  --text-primary: #1a1a1a;
+  --text-secondary: #555555;
+  --text-muted: #888888;
+  --border: #d0d0d0;
+  --border-strong: #b0b0b0;
+  --bg-accent: #e3edfc;
+  --text-accent: #1a1a1a;
+  --fill-accent: #3b82f6;
+  --fill-accent-hover: #2f6fd1;
+  --on-accent: #ffffff;
+}
+
 body.theme-cherry {
   --surface-0: #fdd4e4;
   --surface-1: #ffe6f0;
@@ -395,6 +411,10 @@ body.theme-sunshine {
     <div class="form-group">
       <label>Color Theme</label>
       <div class="options-group">
+        <div class="option-radio" id="themeDe" onclick="selectTheme('default')">
+          <div class="theme-preview" style="background: #3b82f6;"></div>
+          <label>Default</label>
+        </div>
         <div class="option-radio" id="themeCh" onclick="selectTheme('cherry')">
           <div class="theme-preview" style="background: #ff6b9d;"></div>
           <label>Cherry Blossom</label>
@@ -743,7 +763,7 @@ let selectedProfilePicture = 'star';
 
 function getSettings() {
   const saved = localStorage.getItem('appSettings');
-  return saved ? JSON.parse(saved) : { theme: 'cherry', font: 'sans', size: 1 };
+  return saved ? JSON.parse(saved) : { theme: 'default', font: 'sans', size: 1 };
 }
 
 function saveSettings(settings) {
@@ -752,7 +772,7 @@ function saveSettings(settings) {
 }
 
 function applySettings(settings) {
-  document.body.classList.remove('theme-cherry', 'theme-arctic', 'theme-coffee', 'theme-jungle', 'theme-autumn', 'theme-lavender', 'theme-cherryred', 'theme-sunshine');
+  document.body.classList.remove('theme-default', 'theme-cherry', 'theme-arctic', 'theme-coffee', 'theme-jungle', 'theme-autumn', 'theme-lavender', 'theme-cherryred', 'theme-sunshine');
   document.body.classList.add('theme-' + settings.theme);
 
   document.body.classList.remove('font-serif', 'font-mono', 'font-changa', 'font-indie', 'font-itim', 'font-amatic', 'font-comic');
@@ -809,6 +829,7 @@ function updateSizeRadios(size) {
 }
 
 function updateThemeRadios(theme) {
+  document.getElementById('themeDe').classList.toggle('selected', theme === 'default');
   document.getElementById('themeCh').classList.toggle('selected', theme === 'cherry');
   document.getElementById('themeAr').classList.toggle('selected', theme === 'arctic');
   document.getElementById('themeCo').classList.toggle('selected', theme === 'coffee');
