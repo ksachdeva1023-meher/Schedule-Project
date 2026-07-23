@@ -198,8 +198,15 @@ button, input, textarea, select { font-family: inherit; }
 .hour-input { width: 100%; padding: 6px 10px; border: 0.5px solid var(--border-strong); border-radius: var(--radius); font-size: 13px; background: var(--surface-1); color: var(--text-primary); }
 .hour-input:focus { outline: none; border-color: var(--border-accent); box-shadow: 0 0 0 2px var(--bg-accent); }
 
-.create-list-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; max-width: 700px; margin: 0 auto 1.5rem; padding: 16px; border-radius: 12px; border: none; background: var(--fill-accent); color: var(--on-accent); font-size: 17px; font-weight: 500; cursor: pointer; }
+.list-header-row { display: flex; gap: 10px; max-width: 700px; margin: 0 auto 1.5rem; }
+.create-list-btn { display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1; padding: 16px; border-radius: 12px; border: none; background: var(--fill-accent); color: var(--on-accent); font-size: 17px; font-weight: 500; cursor: pointer; }
 .create-list-btn:hover { background: var(--fill-accent-hover); }
+.search-icon-btn { flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 56px; border-radius: 12px; border: 0.5px solid var(--border-strong); background: var(--surface-1); color: var(--text-primary); cursor: pointer; transition: all 0.2s; }
+.search-icon-btn:hover { background: var(--surface-2); border-color: var(--border-stronger); }
+.search-icon-btn.active { border: 2px solid var(--fill-accent); background: var(--bg-accent); }
+.search-row { max-width: 700px; margin: 0 auto 1.5rem; }
+.search-input { width: 100%; padding: 12px 14px; border: 0.5px solid var(--border-strong); border-radius: 10px; font-size: 14px; background: var(--surface-1); color: var(--text-primary); }
+.search-input:focus { outline: none; border-color: var(--border-accent); box-shadow: 0 0 0 2px var(--bg-accent); }
 .todo-header-row { display: flex; gap: 12px; align-items: flex-start; max-width: 700px; margin: 0 auto 1.5rem; }
 .todo-title-input { flex: 1; border: 0.5px solid var(--border-strong); background: var(--surface-1); border-radius: 10px; padding: 12px 14px; font-size: 18px; font-weight: 500; color: var(--text-primary); min-width: 0; }
 .todo-title-input:focus { outline: none; border-color: var(--border-accent); box-shadow: 0 0 0 2px var(--bg-accent); }
@@ -773,9 +780,15 @@ body.theme-sunshine {
       <button class="back-arrow-lg" onclick="switchView('home')" aria-label="Back to home">←</button>
       <div style="flex: 1;"></div>
     </div>
-    <button class="create-list-btn" onclick="createNewTodoList()">
-      + Create a new to-do list
-    </button>
+    <div class="list-header-row">
+      <button class="create-list-btn" onclick="createNewTodoList()">+ Create a new to-do list</button>
+      <button class="search-icon-btn" id="todoSearchToggle" onclick="toggleListSearch('todo')" aria-label="Search to-do lists" title="Search to-do lists">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      </button>
+    </div>
+    <div id="todoSearchRow" class="search-row hidden">
+      <input type="text" id="todoSearchInput" class="search-input" placeholder="Search to-do lists by title..." oninput="renderTodoListsScreen()">
+    </div>
     <div id="todoListsContainer" class="notes-list"></div>
     <p id="todoListsEmptyState" class="notes-empty hidden">No to-do lists yet.</p>
   </div>
@@ -802,7 +815,15 @@ body.theme-sunshine {
       <button class="back-arrow-lg" onclick="switchView('home')" aria-label="Back to home">←</button>
       <div style="flex: 1;"></div>
     </div>
-    <button class="create-list-btn" onclick="createNewNote()">+ Create a new note</button>
+    <div class="list-header-row">
+      <button class="create-list-btn" onclick="createNewNote()">+ Create a new note</button>
+      <button class="search-icon-btn" id="notesSearchToggle" onclick="toggleListSearch('notes')" aria-label="Search notes" title="Search notes">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      </button>
+    </div>
+    <div id="notesSearchRow" class="search-row hidden">
+      <input type="text" id="notesSearchInput" class="search-input" placeholder="Search notes by title..." oninput="renderNotesList()">
+    </div>
     <div id="notesList" class="notes-list"></div>
     <p id="notesEmptyState" class="notes-empty hidden">No notes yet.</p>
   </div>
@@ -857,7 +878,15 @@ body.theme-sunshine {
       <button class="back-arrow-lg" onclick="switchView('home')" aria-label="Back to home">←</button>
       <div style="flex: 1;"></div>
     </div>
-    <button class="create-list-btn" onclick="createNewEvent()">+ Create a new event plan</button>
+    <div class="list-header-row">
+      <button class="create-list-btn" onclick="createNewEvent()">+ Create a new event plan</button>
+      <button class="search-icon-btn" id="eventsSearchToggle" onclick="toggleListSearch('events')" aria-label="Search event plans" title="Search event plans">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      </button>
+    </div>
+    <div id="eventsSearchRow" class="search-row hidden">
+      <input type="text" id="eventsSearchInput" class="search-input" placeholder="Search event plans by title..." oninput="renderEventsScreen()">
+    </div>
     <div id="eventsContainer" class="notes-list"></div>
     <p id="eventsEmptyState" class="notes-empty hidden">No event plans yet.</p>
   </div>
@@ -1277,12 +1306,37 @@ const ERASER_SIZES = [
   { label: 'Large', value: 50 }
 ];
 
+function toggleListSearch(key) {
+  const row = document.getElementById(key + 'SearchRow');
+  const toggle = document.getElementById(key + 'SearchToggle');
+  const input = document.getElementById(key + 'SearchInput');
+  const showing = row.classList.contains('hidden');
+  row.classList.toggle('hidden', !showing);
+  toggle.classList.toggle('active', showing);
+  if (showing) {
+    input.focus();
+  } else {
+    input.value = '';
+    if (key === 'todo') renderTodoListsScreen();
+    else if (key === 'notes') renderNotesList();
+    else if (key === 'events') renderEventsScreen();
+  }
+}
+
+function getSearchQuery(key) {
+  const input = document.getElementById(key + 'SearchInput');
+  return input ? input.value.trim().toLowerCase() : '';
+}
+
 function renderNotesList() {
-  const notes = getNotes().slice().sort((a, b) => b.updatedAt - a.updatedAt);
+  const query = getSearchQuery('notes');
+  let notes = getNotes().slice().sort((a, b) => b.updatedAt - a.updatedAt);
+  if (query) notes = notes.filter(n => (n.title || '').toLowerCase().includes(query));
   const container = document.getElementById('notesList');
   const emptyState = document.getElementById('notesEmptyState');
   if (!notes.length) {
     container.innerHTML = '';
+    emptyState.textContent = query ? 'No notes match your search.' : 'No notes yet.';
     emptyState.classList.remove('hidden');
     return;
   }
@@ -2136,11 +2190,14 @@ function saveEventsToStorage(events) {
 }
 
 function renderEventsScreen() {
-  const events = getEvents().slice().sort((a, b) => b.updatedAt - a.updatedAt);
+  const query = getSearchQuery('events');
+  let events = getEvents().slice().sort((a, b) => b.updatedAt - a.updatedAt);
+  if (query) events = events.filter(e => (e.title || '').toLowerCase().includes(query));
   const container = document.getElementById('eventsContainer');
   const emptyState = document.getElementById('eventsEmptyState');
   if (!events.length) {
     container.innerHTML = '';
+    emptyState.textContent = query ? 'No event plans match your search.' : 'No event plans yet.';
     emptyState.classList.remove('hidden');
     return;
   }
@@ -2311,11 +2368,14 @@ function getCurrentTodoList() {
 let currentTodoListId = null;
 
 function renderTodoListsScreen() {
-  const lists = getTodoLists().slice().sort((a, b) => b.updatedAt - a.updatedAt);
+  const query = getSearchQuery('todo');
+  let lists = getTodoLists().slice().sort((a, b) => b.updatedAt - a.updatedAt);
+  if (query) lists = lists.filter(l => (l.title || '').toLowerCase().includes(query));
   const container = document.getElementById('todoListsContainer');
   const emptyState = document.getElementById('todoListsEmptyState');
   if (!lists.length) {
     container.innerHTML = '';
+    emptyState.textContent = query ? 'No to-do lists match your search.' : 'No to-do lists yet.';
     emptyState.classList.remove('hidden');
     return;
   }
