@@ -70,7 +70,7 @@ button, input, textarea, select { font-family: inherit; }
 .pencil-tip-lead { width: 0; height: 0; border-top: 4px solid transparent; border-bottom: 4px solid transparent; border-left: 6px solid #3a2a1a; margin-left: -1px; }
 .option-card h2 { font-size: 21px; font-weight: 500; color: var(--text-primary); margin: 0 0 8px; }
 .option-card p { font-size: 15px; color: var(--text-secondary); margin: 0; }
-.week-glance-btn { background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 16px; padding: 20px 48px; font-size: 18px; font-weight: 500; color: var(--text-primary); cursor: pointer; transition: all 0.2s; }
+.week-glance-btn { background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 16px; padding: 40px 96px; font-size: 30px; font-weight: 500; color: var(--text-primary); cursor: pointer; transition: all 0.2s; width: 100%; max-width: 1000px; }
 .week-glance-btn:hover { border-color: var(--border-stronger); background: var(--surface-2); }
 .week-glance-btn:active { transform: scale(0.98); }
 .week-days-list { display: flex; flex-direction: column; gap: 10px; max-width: 700px; margin: 0 auto; }
@@ -257,6 +257,22 @@ body.theme-default {
   --on-accent: #ffffff;
 }
 
+body.theme-defaultdark {
+  --surface-0: #16171a;
+  --surface-1: #202227;
+  --surface-2: #2b2e35;
+  --text-primary: #f0f0f2;
+  --text-secondary: #b5b8c0;
+  --text-muted: #82858e;
+  --border: #3a3d45;
+  --border-strong: #4d515b;
+  --bg-accent: #1d2a44;
+  --text-accent: #ffffff;
+  --fill-accent: #5b93f7;
+  --fill-accent-hover: #7ba6f9;
+  --on-accent: #0c0d0f;
+}
+
 body.theme-cherry {
   --surface-0: #fdd4e4;
   --surface-1: #ffe6f0;
@@ -428,6 +444,10 @@ body.theme-sunshine {
         <div class="option-radio" id="themeDe" onclick="selectTheme('default')">
           <div class="theme-preview" style="background: #ffffff; border-color: #888888;"></div>
           <label>Default</label>
+        </div>
+        <div class="option-radio" id="themeDeDark" onclick="selectTheme('defaultdark')">
+          <div class="theme-preview" style="background: #202227; border-color: #4d515b;"></div>
+          <label>Default (Dark)</label>
         </div>
         <div class="option-radio" id="themeCh" onclick="selectTheme('cherry')">
           <div class="theme-preview" style="background: #ff6b9d;"></div>
@@ -803,7 +823,7 @@ function saveSettings(settings) {
 }
 
 function applySettings(settings) {
-  document.body.classList.remove('theme-default', 'theme-cherry', 'theme-arctic', 'theme-coffee', 'theme-jungle', 'theme-autumn', 'theme-lavender', 'theme-cherryred', 'theme-sunshine');
+  document.body.classList.remove('theme-default', 'theme-defaultdark', 'theme-cherry', 'theme-arctic', 'theme-coffee', 'theme-jungle', 'theme-autumn', 'theme-lavender', 'theme-cherryred', 'theme-sunshine');
   document.body.classList.add('theme-' + settings.theme);
 
   document.body.classList.remove('font-serif', 'font-mono', 'font-changa', 'font-indie', 'font-itim', 'font-amatic', 'font-comic');
@@ -861,6 +881,7 @@ function updateSizeRadios(size) {
 
 function updateThemeRadios(theme) {
   document.getElementById('themeDe').classList.toggle('selected', theme === 'default');
+  document.getElementById('themeDeDark').classList.toggle('selected', theme === 'defaultdark');
   document.getElementById('themeCh').classList.toggle('selected', theme === 'cherry');
   document.getElementById('themeAr').classList.toggle('selected', theme === 'arctic');
   document.getElementById('themeCo').classList.toggle('selected', theme === 'coffee');
