@@ -866,10 +866,9 @@ body.theme-sunshine {
       </div>
     </div>
 
-    <div class="event-plan-heading-row">
-      <h3>Event Plan (every 30 minutes)</h3>
+    <div class="event-fields-block">
+      <button class="import-btn" onclick="openEventTimePlan()">Time Plan</button>
     </div>
-    <div id="eventPlanSchedule" class="event-plan-schedule"></div>
 
     <div class="event-fields-block">
       <div class="form-group">
@@ -889,6 +888,17 @@ body.theme-sunshine {
         <textarea id="eventNotesInput" placeholder="Anything else?" oninput="updateEventField('notes', this.value)"></textarea>
       </div>
     </div>
+  </div>
+
+  <div id="eventTimePlanScreen" class="hidden">
+    <div class="header-bar">
+      <button onclick="closeEventTimePlan()" aria-label="Save and exit"><span class="back-arrow-icon">←</span> Save and Exit</button>
+      <div style="flex: 1;"></div>
+    </div>
+    <div class="event-plan-heading-row">
+      <h3 id="eventTimePlanTitle">Time Plan</h3>
+    </div>
+    <div id="eventPlanSchedule" class="event-plan-schedule"></div>
   </div>
 </div>
 
@@ -1063,6 +1073,7 @@ function setCurrentProfile(profileId) {
   document.getElementById('todoEditorScreen').classList.add('hidden');
   document.getElementById('noteEditorScreen').classList.add('hidden');
   document.getElementById('eventEditorScreen').classList.add('hidden');
+  document.getElementById('eventTimePlanScreen').classList.add('hidden');
   switchView('home');
 
   applySettings(getSettings());
@@ -2190,7 +2201,20 @@ function renderEventEditor() {
   document.getElementById('eventFoodInput').value = ev.food || '';
   document.getElementById('eventSuppliesInput').value = ev.supplies || '';
   document.getElementById('eventNotesInput').value = ev.notes || '';
+}
+
+function openEventTimePlan() {
+  const ev = getCurrentEvent();
+  if (!ev) return;
+  document.getElementById('eventTimePlanTitle').textContent = 'Time Plan' + (ev.title ? ' — ' + ev.title : '');
   renderEventPlanSchedule(ev);
+  document.getElementById('eventEditorScreen').classList.add('hidden');
+  document.getElementById('eventTimePlanScreen').classList.remove('hidden');
+}
+
+function closeEventTimePlan() {
+  document.getElementById('eventTimePlanScreen').classList.add('hidden');
+  document.getElementById('eventEditorScreen').classList.remove('hidden');
 }
 
 function renderEventPlanSchedule(ev) {
