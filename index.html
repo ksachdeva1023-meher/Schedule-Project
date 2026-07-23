@@ -173,6 +173,9 @@ button, input, textarea, select { font-family: inherit; }
 .day-title-input::placeholder { color: var(--text-secondary); }
 .import-btn { background: var(--surface-0); border: 0.5px solid var(--border-strong); border-radius: var(--radius); padding: 8px 14px; font-size: 13px; font-weight: 500; color: var(--text-primary); cursor: pointer; }
 .import-btn:hover { background: var(--surface-2); border-color: var(--border-stronger); }
+.time-plan-btn { background: var(--surface-0); border: 0.5px solid var(--border-strong); border-radius: 12px; padding: 18px 36px; font-size: 18px; font-weight: 500; color: var(--text-primary); cursor: pointer; }
+.time-plan-btn:hover { background: var(--surface-2); border-color: var(--border-stronger); }
+.time-plan-btn:active { transform: scale(0.98); }
 .linked-items-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .linked-item-chip { display: flex; align-items: center; gap: 2px; background: var(--bg-accent); border-radius: 999px; padding: 4px 4px 4px 14px; }
 .linked-item-btn { background: none; border: none; color: var(--text-accent); font-size: 13px; font-weight: 500; cursor: pointer; padding: 2px 0; }
@@ -867,7 +870,7 @@ body.theme-sunshine {
     </div>
 
     <div class="event-fields-block">
-      <button class="import-btn" onclick="openEventTimePlan()">Time Plan</button>
+      <button class="time-plan-btn" onclick="openEventTimePlan()">Time Plan</button>
     </div>
 
     <div class="event-fields-block">
