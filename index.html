@@ -632,9 +632,8 @@ body.theme-sunshine {
 
   <div id="dayViewScreen" class="hidden">
     <div class="header-bar">
-      <button onclick="closeDayView()" aria-label="Back to calendar">←</button>
-      <h2 id="dayViewTitle">Date</h2>
-      <div style="width: 32px;"></div>
+      <button onclick="closeDayView()" aria-label="Save and exit">← Save and Exit</button>
+      <div style="flex: 1;"></div>
     </div>
     <div class="day-title-card">
       <input type="text" id="dayTitleInput" class="day-title-input" placeholder="Add a title" onblur="saveDayTitle(this.value)" onkeydown="if(event.key==='Enter'){ this.blur(); }">
@@ -1561,8 +1560,6 @@ const HOUR_LABELS = Array.from({ length: 24 }, (_, h) => {
 
 function openDayView(dateStr) {
   selectedDayStr = dateStr;
-  const [y, m, d] = dateStr.split('-').map(Number);
-  document.getElementById('dayViewTitle').textContent = MONTH_NAMES[m - 1] + ' ' + d + ', ' + y;
   renderDayView();
   document.getElementById('calendarScreen').classList.add('hidden');
   document.getElementById('dayViewScreen').classList.remove('hidden');
