@@ -192,8 +192,11 @@ button, input, textarea, select { font-family: inherit; }
 .hour-task-chip input[type="checkbox"] { cursor: pointer; flex-shrink: 0; }
 .hour-task-text { flex: 1; font-size: 13px; color: var(--text-primary); word-break: break-word; }
 .hour-task-chip.completed .hour-task-text { text-decoration: line-through; color: var(--text-secondary); }
+.hour-input-row { display: flex; align-items: center; gap: 8px; }
 .hour-input { width: 100%; padding: 6px 10px; border: 0.5px solid var(--border-strong); border-radius: var(--radius); font-size: 13px; background: var(--surface-1); color: var(--text-primary); }
 .hour-input:focus { outline: none; border-color: var(--border-accent); box-shadow: 0 0 0 2px var(--bg-accent); }
+.hour-save-btn { flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: var(--radius); border: none; background: var(--fill-accent); color: var(--on-accent); cursor: pointer; }
+.hour-save-btn:hover { background: var(--fill-accent-hover); }
 
 .list-header-row { display: flex; gap: 10px; max-width: 700px; margin: 0 auto 1.5rem; }
 .create-list-btn { display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1; padding: 16px; border-radius: 12px; border: none; background: var(--fill-accent); color: var(--on-accent); font-size: 17px; font-weight: 500; cursor: pointer; }
@@ -2054,11 +2057,23 @@ function renderDayView() {
       <div class="hour-row">
         <div class="hour-label">${HOUR_LABELS[h]}</div>
         <div class="hour-tasks">${hourTasks.map(taskChipHtml).join('')}</div>
-        <input type="text" class="hour-input" id="hourInput-${h}" placeholder="Add..." onkeydown="if(event.key==='Enter'){ addHourTaskFromInput(${h}); }">
+        <div class="hour-input-row">
+          <input type="text" class="hour-input" id="hourInput-${h}" placeholder="Add..." oninput="toggleHourSaveBtn(${h})" onkeydown="if(event.key==='Enter'){ addHourTaskFromInput(${h}); }">
+          <button class="hour-save-btn hidden" id="hourSaveBtn-${h}" onclick="addHourTaskFromInput(${h})" aria-label="Save">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </button>
+        </div>
       </div>
     `;
   }
   document.getElementById('hourlySchedule').innerHTML = html;
+}
+
+function toggleHourSaveBtn(hour) {
+  const input = document.getElementById('hourInput-' + hour);
+  const btn = document.getElementById('hourSaveBtn-' + hour);
+  if (!input || !btn) return;
+  btn.classList.toggle('hidden', input.value.trim() === '');
 }
 
 function addHourTaskFromInput(hour) {
