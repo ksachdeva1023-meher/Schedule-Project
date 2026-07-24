@@ -224,12 +224,14 @@ button, input, textarea, select { font-family: inherit; }
 .category-tag.selected { border-color: var(--text-primary); }
 .hour-save-btn { flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: var(--radius); border: none; background: var(--fill-accent); color: var(--on-accent); cursor: pointer; }
 .hour-save-btn:hover { background: var(--fill-accent-hover); }
-.hour-repeat-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
-.repeat-toggle-btn { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; border: 0.5px solid var(--border-strong); background: var(--surface-1); color: var(--text-secondary); font-size: 12px; font-weight: 500; cursor: pointer; }
-.repeat-toggle-btn:hover { background: var(--surface-2); border-color: var(--border-stronger); }
-.repeat-toggle-btn.active { border: 2px solid var(--fill-accent); background: var(--bg-accent); color: var(--text-accent); }
-.repeat-date-input { padding: 6px 10px; border: 0.5px solid var(--border-strong); border-radius: var(--radius); font-size: 12px; background: var(--surface-1); color: var(--text-primary); width: 110px; }
-.repeat-date-input:focus { outline: none; border-color: var(--border-accent); box-shadow: 0 0 0 2px var(--bg-accent); }
+.hour-repeat-row { display: flex; align-items: center; margin-top: 8px; }
+.repeat-toggle-pill { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; border: 0.5px solid var(--border-strong); background: var(--surface-1); padding: 4px 12px 4px 12px; cursor: pointer; }
+.repeat-toggle-pill:hover { background: var(--surface-2); border-color: var(--border-stronger); }
+.repeat-toggle-pill.active { border: 2px solid var(--fill-accent); background: var(--bg-accent); }
+.repeat-toggle-label { display: flex; align-items: center; gap: 6px; background: none; border: none; cursor: pointer; font-size: 12px; font-weight: 500; color: var(--text-secondary); padding: 4px 0; white-space: nowrap; }
+.repeat-toggle-pill.active .repeat-toggle-label { color: var(--text-accent); }
+.repeat-date-input { border: none; background: transparent; font-size: 12px; font-weight: 500; color: var(--text-primary); width: 90px; padding: 4px 0 4px 8px; }
+.repeat-date-input:focus { outline: none; }
 .repeat-chip-icon { flex-shrink: 0; display: flex; align-items: center; color: var(--text-secondary); }
 
 .list-header-row { display: flex; gap: 10px; max-width: 700px; margin: 0 auto 1.5rem; }
@@ -2226,11 +2228,13 @@ function renderDayView() {
           </button>
         </div>
         <div class="hour-repeat-row hidden" id="hourRepeatRow-${h}" data-repeat="off">
-          <button class="repeat-toggle-btn" id="hourRepeatToggle-${h}" onclick="toggleHourRepeat(${h})">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
-            <span id="hourRepeatLabel-${h}">Repeat weekly</span>
-          </button>
-          <input type="text" class="repeat-date-input hidden" id="hourRepeatDate-${h}" placeholder="mm/dd/yyyy" maxlength="10" inputmode="numeric" oninput="handleRepeatDateInput(this)">
+          <div class="repeat-toggle-pill" id="hourRepeatPill-${h}">
+            <button class="repeat-toggle-label" onclick="toggleHourRepeat(${h})">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+              Repeat weekly until
+            </button>
+            <input type="text" class="repeat-date-input" id="hourRepeatDate-${h}" placeholder="mm/dd/yyyy" maxlength="10" inputmode="numeric" oninput="handleRepeatDateInput(this)">
+          </div>
         </div>
       </div>
     `;
@@ -2252,16 +2256,11 @@ function toggleHourSaveBtn(hour) {
 
 function toggleHourRepeat(hour) {
   const repeatRow = document.getElementById('hourRepeatRow-' + hour);
-  const toggleBtn = document.getElementById('hourRepeatToggle-' + hour);
-  const label = document.getElementById('hourRepeatLabel-' + hour);
-  const dateInput = document.getElementById('hourRepeatDate-' + hour);
-  if (!repeatRow) return;
+  const pill = document.getElementById('hourRepeatPill-' + hour);
+  if (!repeatRow || !pill) return;
   const isOn = repeatRow.dataset.repeat === 'on';
   repeatRow.dataset.repeat = isOn ? 'off' : 'on';
-  toggleBtn.classList.toggle('active', !isOn);
-  label.textContent = isOn ? 'Repeat weekly' : 'Repeat weekly until';
-  dateInput.classList.toggle('hidden', isOn);
-  if (isOn) dateInput.value = '';
+  pill.classList.toggle('active', !isOn);
 }
 
 function handleRepeatDateInput(el) {
