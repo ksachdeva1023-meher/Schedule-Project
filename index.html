@@ -180,6 +180,12 @@ button, input, textarea, select { font-family: inherit; }
 .calendar-day-dot.category-social { background: var(--category-social); }
 .calendar-day-dot.category-academic { background: var(--category-academic); }
 .calendar-day-dot.category-other { background: var(--category-other); }
+.category-legend { position: fixed; bottom: 16px; right: 16px; z-index: 100; background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 12px; padding: 12px 16px; display: flex; flex-direction: column; gap: 6px; }
+.category-legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-primary); }
+.category-legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.category-legend-dot.category-social { background: var(--category-social); }
+.category-legend-dot.category-academic { background: var(--category-academic); }
+.category-legend-dot.category-other { background: var(--category-other); }
 .day-task-delete { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 14px; padding: 2px 6px; flex-shrink: 0; }
 .day-empty-tasks { color: var(--text-secondary); font-size: 13px; text-align: center; padding: 8px 0; }
 .day-title-card { max-width: 700px; margin: 0 auto 1.5rem; background: var(--surface-1); border: 0.5px solid var(--border-strong); border-radius: 16px; padding: 16px; }
@@ -770,6 +776,11 @@ body.theme-sunshine {
       <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
     </div>
     <div id="calendarGrid" class="calendar-grid"></div>
+    <div class="category-legend">
+      <div class="category-legend-item"><span class="category-legend-dot category-social"></span>Social</div>
+      <div class="category-legend-item"><span class="category-legend-dot category-academic"></span>Academic</div>
+      <div class="category-legend-item"><span class="category-legend-dot category-other"></span>Other</div>
+    </div>
   </div>
 
   <div id="weekScreen" class="hidden">
@@ -786,6 +797,11 @@ body.theme-sunshine {
       <button class="calendar-nav-btn" onclick="changeWeek(1)" aria-label="Next week">›</button>
     </div>
     <div id="weekDaysList" class="week-days-list"></div>
+    <div class="category-legend">
+      <div class="category-legend-item"><span class="category-legend-dot category-social"></span>Social</div>
+      <div class="category-legend-item"><span class="category-legend-dot category-academic"></span>Academic</div>
+      <div class="category-legend-item"><span class="category-legend-dot category-other"></span>Other</div>
+    </div>
   </div>
 
   <div id="dayViewScreen" class="hidden">
@@ -799,6 +815,11 @@ body.theme-sunshine {
       <div id="linkedItemsList" class="linked-items-list"></div>
     </div>
     <div id="hourlySchedule" class="hourly-schedule"></div>
+    <div class="category-legend">
+      <div class="category-legend-item"><span class="category-legend-dot category-social"></span>Social</div>
+      <div class="category-legend-item"><span class="category-legend-dot category-academic"></span>Academic</div>
+      <div class="category-legend-item"><span class="category-legend-dot category-other"></span>Other</div>
+    </div>
   </div>
 
   <div id="todolistScreen" class="hidden">
